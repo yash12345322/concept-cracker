@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept Cracker | Yash Kumar Jangid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
+        
+        /* Navbar */
+        nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+        .logo span { color: var(--accent); }
+        .nav-links a { text-decoration: none; color: #444; font-weight: 500; margin-left: 30px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
+
+        /* Hero Section */
+        .hero { background: linear-gradient(rgba(0,35,71,0.9), rgba(0,35,71,0.9)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80'); 
+                background-size: cover; background-position: center; color: white; padding: 100px 10%; text-align: center; }
+        .hero h1 { font-size: 50px; margin-bottom: 20px; text-transform: uppercase; }
+        .hero p { font-size: 20px; opacity: 0.8; max-width: 700px; margin: 0 auto 30px; }
+
+        /* Dashboard Cards */
+        .section-title { text-align: center; margin: 50px 0 30px; font-size: 32px; color: var(--primary); }
+        .container { padding: 0 10% 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--white); padding: 40px 20px; border-radius: 20px; text-align: center; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; border-bottom: 5px solid transparent; }
+        .card:hover { transform: translateY(-10px); border-bottom: 5px solid var(--accent); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .card i { font-size: 45px; color: var(--secondary); margin-bottom: 20px; }
+        .card h3 { font-size: 22px; margin-bottom: 15px; }
+
+        /* Mentor Section */
+        .mentor-sec { background: var(--white); padding: 80px 10%; display: flex; align-items: center; gap: 60px; flex-wrap: wrap; }
+        .mentor-img-box { position: relative; }
+        .mentor-img { width: 250px; height: 250px; border-radius: 30px; object-fit: cover; box-shadow: 20px 20px 0 var(--secondary); }
+        .mentor-info { flex: 1; }
+        .mentor-info h2 { font-size: 35px; color: var(--primary); margin-bottom: 10px; }
+        .tagline { color: var(--accent); font-weight: bold; font-size: 18px; margin-bottom: 20px; display: block; }
+
+        /* Login Modal (Popup) */
+        #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .auth-box { background: var(--white); padding: 40px; border-radius: 25px; width: 380px; text-align: center; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .auth-box input { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+        .btn-main { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .btn-login { background: var(--primary); color: white; }
+        .btn-login:hover { background: var(--secondary); }
+        .btn-login:disabled { background: #999; cursor: not-allowed; }
+        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; }
+
+        /* Footer */
+        footer { background: var(--primary); color: white; padding: 50px 10%; text-align: center; }
+        .social-icons { margin-top: 25px; display: flex; justify-content: center; gap: 25px; }
+        .social-icons a { color: white; font-size: 28px; transition: 0.3s; }
+        .social-icons a:hover { color: var(--accent); transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+
+<div id="auth-modal">
+    <span class="close-btn" onclick="closeAuth()">&times;</span>
+    <div class="auth-box" id="login-container">
+        <h2 style="color:var(--primary)">Student Login</h2>
+        <p>Enter your credentials to access tests</p>
+        <input type="text" id="uid" placeholder="Registration ID (Ex: YASH101)">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn-main btn-login" onclick="checkAccess()">Access Tests</button>
+        <p style="margin-top:20px; font-size:14px;">Don't have an ID? <a href="javascript:void(0)" onclick="showSignup()" style="color:var(--secondary); font-weight:bold;">Request Sign-up</a></p>
+    </div>
+
+    <div class="auth-box" id="signup-container" style="display:none">
+        <h2 style="color:var(--accent)">Registration Request</h2>
+        <p>Fill details for account activation</p>
+        <input type="text" id="reg-name" placeholder="Full Name">
+        <input type="text" id="reg-mobile" placeholder="Mobile Number">
+        <input type="password" id="reg-pass" placeholder="Set Password">
+        <button class="btn-main btn-login" style="background:var(--accent)" onclick="submitSignup(this)">Submit Details</button>
+        <button class="btn-main" style="background:#eee; color:#333;" onclick="showLogin()">Back to Login</button>
+    </div>
+</div>
+
+<nav>
+    <div class="logo">CONCEPT <span>CRACKER</span></div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#dashboard">Tests</a>
+        <a href="#mentor">Mentor</a>
+        <a href="#contact">Contact</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Crack CSIR NET Physics</h1>
+    <p>Expert mentorship and high-quality mock tests designed by Yash Kumar Jangid to help you excel in competitive exams.</p>
+    <a href="#dashboard" style="background:var(--accent); color:white; padding:15px 40px; text-decoration:none; border-radius:50px; font-weight:bold;">EXPLORE NOW</a>
+</section>
+
+<h2 class="section-title" id="dashboard">Learning Dashboard</h2>
+<div class="container">
+    <div class="card" onclick="openAuth()">
+        <i class="fas fa-vial"></i>
+        <h3>CSIR Mock Tests</h3>
+        <p>Full length NTA style tests with detailed analysis and marking.</p>
+    </div>
+    
+    <div class="card" onclick="alert('Notes Section Coming Soon!')">
+        <i class="fas fa-book-open"></i>
+        <h3>Premium Notes</h3>
+        <p>Handwritten and summarized notes for all Mathematical Physics units.</p>
+    </div>
+
+    <div class="card" onclick="alert('PYQ Database is under maintenance')">
+        <i class="fas fa-graduation-cap"></i>
+        <h3>Solved PYQs</h3>
+        <p>Previous year questions with step-by-step video/text solutions.</p>
+    </div>
+</div>
+
+<section class="mentor-sec" id="mentor">
+    <div class="mentor-img-box">
+        <img src="https://via.placeholder.com/250" alt="Yash Kumar" class="mentor-img">
+    </div>
+    <div class="mentor-info">
+        <span class="tagline">MEET YOUR MENTOR</span>
+        <h2>Yash Kumar Jangid</h2>
+        <p>Master's in Physics | CSIR NET Aspirant & Mentor</p>
+        <p>Founder of <b>Concept Cracker</b>, dedicated to simplifying complex physics concepts for students across Rajasthan and beyond. My mission is to provide accessible, high-quality test series for Mathematical Physics and more.</p>
+        <div class="social-icons" style="justify-content: flex-start;">
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+    <h3>Concept Cracker by Yash</h3>
+    <p>Empowering Physics Aspirants since 2026</p>
+    <div class="social-icons">
+        <a href="#"><i class="fab fa-youtube"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="mailto:support@conceptcracker.com"><i class="fas fa-envelope"></i></a>
+    </div>
+    <p style="margin-top:30px; opacity:0.6; font-size:14px;">&copy; 2026 All Rights Reserved.</p>
+</footer>
+
+<script>
+    function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+    function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+    function showSignup() { document.getElementById('login-container').style.display = 'none'; document.getElementById('signup-container').style.display = 'block'; }
+    function showLogin() { document.getElementById('signup-container').style.display = 'none'; document.getElementById('login-container').style.display = 'block'; }
+
+    // login verification
+    function checkAccess() {
+        const id = document.getElementById('uid').value;
+        const p = document.getElementById('pass').value;
+        
+        if((id === "YASH101" && p === "physics") || (id === "9928051997" && p === "@Yash12345")) {
+            window.location.href = "subjects.html";
+        } else {
+            alert("Oops! Invalid ID or your account is pending activation by Yash Sir.");
+        }
+    }
+
+    // Google Sheets Link Function
+    function submitSignup(btn) {
+        const name = document.getElementById('reg-name').value;
+        const mobile = document.getElementById('reg-mobile').value;
+        const password = document.getElementById('reg-pass').value;
+
+        if(!name || !mobile || !password) {
+            alert("Bhai, saari details fill karna zaroori hai!");
+            return;
+        }
+
+        // Button Loading State
+        const originalText = btn.innerText;
+        btn.innerText = "Sending Request...";
+        btn.disabled = true;
+
+        // Aapka Google Apps Script URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+
+        // Data bhejna
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, mobile: mobile, password: password })
+        })
+        .then(() => {
+            alert("Registration Successful! 🎉 Your request has been received. Please wait while the admin verifies and activates your account.");
+            // Reset fields
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-mobile').value = '';
+            document.getElementById('reg-pass').value = '';
+            showLogin();
+        })
+        .catch(error => {
+            alert("Oops! Network error. Dubara try karein.");
+        })
+        .finally(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>
