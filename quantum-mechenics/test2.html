@@ -38,7 +38,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -60,14 +60,13 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                alert("please login to attempt test!");
+                alert("Aapko test access karne ke liye pehle Login karna hoga!");
                 window.location.href = "../index.html#login";
             } else {
                 document.body.style.display = "flex"; 
             }
         });
     </script>
-    
 </head>
 <body>
 
