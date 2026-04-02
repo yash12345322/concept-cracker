@@ -38,37 +38,44 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-<script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
-      authDomain: "concepts-creakres.firebaseapp.com",
-      projectId: "concepts-creakres",
-      appId: "1:882506019552:web:2a5357160294eae7afd685"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    
-    // TrebEdit/Mobile ke liye Error Fix
-    const db = firebase.firestore();
-    db.settings({ experimentalForceLongPolling: true });
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
 
-    // Test page ko turant chupa do jab tak login verify na ho
-    document.write("<style>body { display: none; }</style>");
-    
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-            alert("please login to attempt test!");
-            window.location.href = "../index.html#login";
-        } else {
-            document.body.style.display = "flex"; 
-        }
-    });
-</script>
-    
-    
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // SIRF ADMIN APPROVAL CHECK (Kyunki Email verify karke hi yahan aaya hai)
+                db.collection('students').doc(user.uid).get().then((doc) => {
+                    if (doc.exists && doc.data().status === "Approved") {
+                        document.body.style.display = "flex"; 
+                    } else {
+                        alert("Access denied! Please contact support for the assessment test.");
+                        window.location.href = "../index.html"; 
+                    }
+                }).catch(err => {
+                    alert("Database Error: " + err.message);
+                    window.location.href = "../index.html";
+                });
+            }
+        });
+    </script>
 </head>
 <body>
 
