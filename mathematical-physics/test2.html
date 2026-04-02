@@ -38,6 +38,35 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO (Taki koi cheating na kar sake)
+        document.write("<style>body { display: none; }</style>");
+        
+        // TrebEdit/Mobile ke liye Error Fix
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                alert("please login to attempt test!");
+                window.location.href = "../index.html#login";
+            } else {
+                document.body.style.display = "flex"; 
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -306,46 +335,123 @@ function tCal(){var c=document.getElementById('calc');c.style.display=c.style.di
 function cI(v){cS+=v;document.getElementById('cd').value=cS;}
 function cC(){cS="";document.getElementById('cd').value="";}
 function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;}catch(e){document.getElementById('cd').value="Err";cS="";}}
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
 
-function subC(force){
-    if(force||confirm("Submit test?")){
-        clearInterval(tInt);document.getElementById('test').style.display='none';document.getElementById('res').style.display='block';
-        var sc=0,ms=0,c=0,ic=0,u=0;
-        for(var i=0;i<qs.length;i++){
-            ms+=qs[i].m;
-            if(uA[i]===null)u++;
-            else if(uA[i]===qs[i].a){c++;sc+=qs[i].m;}
-            else{ic++;sc-=qs[i].n;}
-        }
-        var acc=c+ic===0?0:((c/(c+ic))*100).toFixed(2);
-        document.getElementById('f-sc').innerText=sc.toFixed(3);document.getElementById('m-sc').innerText=ms;
-        document.getElementById('rc-c').innerText=c;document.getElementById('rc-i').innerText=ic;
-        document.getElementById('rc-u').innerText=u;document.getElementById('rc-a').innerText=acc;
+    // ==========================================================
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
+    // ==========================================================
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var finalScore = sc.toFixed(3);
+            var testTitle = "mathemmatical physics- Test 2"; // Test ka naam
+            var currentDate = new Date().toLocaleString();
+            
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
 
-        var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
-        for(var j=0;j<qs.length;j++){
-            var stat=uA[j]===null?"<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>":(uA[j]===qs[j].a?"<span style='color:green; font-weight:bold;'>[Correct]</span>":"<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
-            var yA=uA[j]===null?"None":qs[j].o[uA[j]];
-            var cA=qs[j].o[qs[j].a];
-            var qText=qs[j].q;
-            var qImg=qs[j].img?"<br><img src='"+qs[j].img+"' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>":"";
-            detHtml+="<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'><div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qText+qImg+"</div></div><div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'><span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br><span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span></div></div>";
-        }
-        document.getElementById('detailed-res').innerHTML=detHtml;
-        setTimeout(function(){if(window.MathJax)MathJax.typeset();},500);
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
 
-        if(window.Chart){
-            new Chart(document.getElementById('rc').getContext('2d'),{
-                type:'doughnut',data:{labels:['Correct','Incorrect','Unattempted'],datasets:[{data:[c,ic,u],backgroundColor:['#28a745','#dc3545','#6c757d']}]}
-            });
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
         }
+    } catch(e) {
+        console.log("Login check error: ", e);
+    }
+    // ==========================================================
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
     }
 }
-window.onload=iT;
-window.onbeforeunload = function() {
-    return "Are you sure you want to refresh? Test progress will be lost.";
-};
 
+// ==== DELETED HUA CODE WAPAS AAGAYA ====
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
 </script>
 </body>
 </html>
