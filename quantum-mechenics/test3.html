@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 3</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li>The countdown timer in the top right corner will display the remaining time.</li>
+            <li>The Question Palette displayed on the right side will show the status of each question.</li>
+            <li><b>Part A (Q.1 to Q.10):</b> +3 Marks for correct, -0.875 Marks for wrong.</li>
+            <li><b>Part B (Q.11 to Q.20):</b> +5 Marks for correct, -1.25 Marks for wrong.</li>
+            <li>Scientific Calculator is available on the right panel.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+// EXACT QUESTIONS COPIED FROM PDF
+// --- QUANTUM MECHANICS TEST 3 QUESTIONS ---
+var qs = [
+    // PART A (Q1 - Q10) | Marks: 3, Negative: 0.875
+    { 
+        q: "The Hamiltonian of a three state system is given by<br><br>$H^{0} = \\begin{pmatrix}3&0&0\\\\ 0&3&0\\\\ 0&0&4\\end{pmatrix}$<br><br>If a time-independent perturbation of the form $H^{\\prime} = A\\begin{pmatrix}0&1&0\\\\ 1&0&0\\\\ 0&0&-2\\end{pmatrix}$ [where A << 1] is applied to the system, then the shift in energy for the eigenvalue $E=3$ will be,", 
+        o: ["$2A, -A$", "$2A, A$", "$\\pm 2A$", "$\\pm A$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a charged particle of charge 'q' in a 1-D harmonic oscillator of frequency $\\omega$. If a weak constant electric field $E = E_0$ is turned on, the 1st order energy correction to the 1st excited state of the particle will be", 
+        o: ["$-qE_0\\sqrt{\\frac{\\hbar}{m\\omega}}$", "$qE_0\\sqrt{\\frac{\\hbar}{m\\omega}}$", "$qE_0\\sqrt{\\frac{2\\hbar}{m\\omega}}$", "Zero"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider a particle of mass m that is bouncing vertically and elastically on a perfectly reflecting hard floor under the following potential<br><br>$V(z) = \\begin{cases} mgz & z>0 \\\\ \\infty & z\\le0 \\end{cases}$<br><br>where 'g' is the gravitational constant. The energy of the particle in the $n^{th}$ state of the system for large n, is proportional to", 
+        o: ["$n^{1/3}$", "$n^{2/3}$", "$n^{1/4}$", "$\\sqrt{n}$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The total scattering cross-section for scattering of a particle of mass m by a $\\delta$-function potential $V(\\vec{r}) = g\\delta^{3}(\\vec{r})$ [g is constant], according to first Born approximation is", 
+        o: ["$\\frac{m^2 g^2}{4\\pi^2 \\hbar^4}$", "$\\frac{m^2 g^2}{2\\pi^2 \\hbar^4}$", "$\\frac{m^2 g^2}{\\pi \\hbar^4}$", "$\\frac{2m^2 g^2}{\\pi \\hbar^4}$"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle of mass 'm' is in a 1-D infinite potential box in the region $0 \\le x \\le a$. If a small perturbation of the form $V(x) = V_0 \\sinh(\\frac{x}{L})$ is introduced (where, $\\frac{a}{L} \\ll 1$), then the first order correction to the second excited state energy of the particle is,<br><br>(Given: $\\int x \\cos(nx)dx = \\frac{x}{n}\\sin(nx) + \\frac{1}{n^2}\\cos(nx) + c$)", 
+        o: ["$\\frac{V_0 a}{L}$", "$\\frac{V_0 a}{2L}$", "$\\frac{2V_0 a}{L}$", "Zero"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The normalized ground state of a particle of mass 'm' under a potential of the form $V(x) = \\alpha|x|$ ($\\alpha>0$) is approximated by,<br><br>$\\psi(x) = \\begin{cases} \\frac{1}{\\sqrt{a}}\\cos(\\frac{\\pi x}{2a}); & |x| \\le a \\\\ 0; & otherwise \\end{cases}$<br><br>The value of 'a' that minimises the ground state energy calculated using variational method, will be<br>[Standard Result: $\\int x \\cos(mx)dx = \\frac{1}{m}x \\sin(mx) + \\frac{1}{m^2}\\cos(mx) + c$]", 
+        o: ["$(\\frac{\\pi^4 \\hbar^2}{2(\\pi^2 - 4)m\\alpha})^{1/3}$", "$(\\frac{\\pi^4 \\hbar^2}{(\\pi^2 - 4)m\\alpha})^{1/3}$", "$(\\frac{\\pi^4 \\hbar^2}{(\\pi^2 + 4)m\\alpha})^{1/3}$", "$(\\frac{\\pi^4 \\hbar^2}{2(\\pi^2 + 4)m\\alpha})^{1/3}$"], 
+        a: 0, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle of mass 'm' and energy E is scattered by the following potential: (Refer to the figure). The transmission probability will be approximately,", 
+        o: ["$\\exp(-\\frac{8a\\sqrt{2m}}{3\\hbar V_0}(V_0 - E)^{3/2})$", "$\\exp(-\\frac{4a\\sqrt{2m}}{3\\hbar V_0}(V_0 - E)^{3/2})$", "$\\exp(-\\frac{a\\sqrt{2m}}{3\\hbar V_0}(V_0 - E)^{3/2})$", "$\\exp(-\\frac{a\\sqrt{2m}}{\\hbar V_0}(V_0 - E)^{3/2})$"], 
+        a: 0, m: 3, n: 0.875, img: "" // YAHAN Q7 KA IMAGE LINK DAALNA HAI (Triangular barrier from -a to a)
+    },
+    { 
+        q: "A particle is in a state $|\\psi\\rangle = \\begin{pmatrix}1\\\\ 0\\end{pmatrix}$ of a system with Hamiltonian $\\hat{H} = H_0 \\begin{pmatrix}2&0\\\\ 0&3\\end{pmatrix}$, where $H_0$ is a positive constant. If a constant perturbation of the form $\\hat{V} = \\alpha\\begin{pmatrix}0&3\\\\ 3&0\\end{pmatrix}$ turned on at time $t=0$, the probability of finding the system in the state $|b\\rangle = \\begin{pmatrix}0\\\\ 1\\end{pmatrix}$ at time 't' will be,", 
+        o: ["$\\frac{12\\alpha^2}{H_0^2}\\sin^2(\\frac{H_0 t}{2\\hbar})$", "$\\frac{36\\alpha^2}{H_0^2}\\sin^2(\\frac{H_0 t}{2\\hbar})$", "$\\frac{12\\alpha^2}{H_0^2}\\sin^2(\\frac{H_0 t}{\\hbar})$", "$\\frac{36\\alpha^2}{H_0^2}\\sin^2(\\frac{H_0 t}{\\hbar})$"], 
+        a: 1, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "Consider the energy level $E = -0.85\\text{ eV}$ in a Hydrogen atom. The number of levels into which this energy level will split, under fine-structure, is equal to", 
+        o: ["2", "3", "4", "5"], 
+        a: 2, m: 3, n: 0.875, img: "" 
+    },
+    { 
+        q: "The partial wave amplitude for p-wave in a scattering process is given by $f_1(\\theta) = \\frac{3i}{k}\\cos\\theta$, where k is the incident wavevector. The value of phase shift $\\delta_1$ for the p-wave is equal to", 
+        o: ["$\\pi/6$", "$\\pi/4$", "$\\pi/3$", "$\\pi/2$"], 
+        a: 3, m: 3, n: 0.875, img: "" 
+    },
+
+    // PART B (Q11 - Q20) | Marks: 5, Negative: 1.25
+    { 
+        q: "A 3D cubic box potential with side a, is perturbed by a dirac delta function bump defined as following:<br><br>$H^{\\prime} = a^3 V_0 \\delta(x - \\frac{a}{4})\\delta(y - \\frac{a}{2})\\delta(z - \\frac{3a}{4})$<br><br>where $V_0$ is a positive constant of appropriate dimensionality and $V_0 a^3 \\ll 1$. The first order energy correction to the ground state energy of the system, will be", 
+        o: ["$V_0$", "$2V_0$", "$3V_0$", "$4V_0$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider the scattering of a projectile having charge $z_1 e$ by a target particle of charge $z_2 e$. If the potential representing the interaction is $V(r) = \\frac{z_1 z_2 e^2}{r}$ then the differential cross section using the first Born-approximation, will be (E is the kinetic energy of the incident particle and $\\theta$ is the scattering angle)", 
+        o: ["$\\frac{z_1^2 z_2^2 e^4}{16E^2}(\\sin\\frac{\\theta}{2})^{-4}$", "$\\frac{z_1^2 z_2^2 e^4}{32E^2}(\\sin\\frac{\\theta}{2})^{-4}$", "$\\frac{z_1^2 z_2^2 e^4}{16E}(\\sin\\frac{\\theta}{2})^{-4}$", "$\\frac{z_1^2 z_2^2 e^4}{16E}(\\sin\\frac{\\theta}{2})^{-2}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a particle of mass m that is bouncing vertically and elastically on a perfectly reflecting hard floor under the following potential:<br><br>$V(z) = \\begin{cases} mgz & z>0 \\\\ \\infty & z\\le0 \\end{cases}$<br><br>where 'g' is the gravitational constant.<br>[Standard result: $\\int_0^\\infty e^{-\\alpha z} z^n dz = \\frac{n!}{\\alpha^{n+1}}$]<br><br>By using the trial wavefunction $\\psi(z, \\alpha) = 2\\sqrt{\\alpha^3}ze^{-\\alpha z}$ with $\\alpha$ as a parameter, the ground state energy of this particle (in terms of $\\alpha$) will be,", 
+        o: ["$\\frac{\\hbar^2 \\alpha^2}{m} + \\frac{3mg}{2\\alpha}$", "$\\frac{\\hbar^2 \\alpha^2}{2m} + \\frac{3mg}{2\\alpha}$", "$\\frac{\\hbar^2 \\alpha^2}{2m} + \\frac{mg}{2\\alpha}$", "$\\frac{\\hbar^2 \\alpha^2}{m} + \\frac{mg}{2\\alpha}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Which of the following is not a Boson?", 
+        o: ["${}_{2}^{4}\\text{He}$", "${}_{1}^{1}\\text{H}$", "${}_{2}^{3}\\text{He}$", "Photon"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A particle of mass m moves in a one-dimensional potential well defined by<br><br>$V(x) = \\begin{cases} 0 & \\text{for } -2a < x < -a \\text{ and } a < x < +2a \\\\ V_0 & \\text{for } -a < x < a \\\\ \\infty & \\text{for } x \\le -2a \\text{ and } x \\ge 2a \\end{cases}$<br><br>The energy of the ground state of the particle corrected upto first order of $V_0$ will be", 
+        o: ["$\\frac{V_0}{2} + \\frac{V_0}{\\pi}$", "$\\frac{V_0}{4} + \\frac{V_0}{\\pi}$", "$\\frac{\\pi^2 \\hbar^2}{32ma^2} + \\frac{V_0}{2} - \\frac{V_0}{\\pi}$", "$\\frac{\\pi^2 \\hbar^2}{32ma^2} + \\frac{V_0}{2} + \\frac{V_0}{\\pi}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a system whose unperturbed Hamiltonian $H_0$ is given by the matrix $H_0 = \\begin{pmatrix}E_0 & 0\\\\ 0 & E_0\\end{pmatrix}$ and a small perturbation $H^{\\prime} = \\begin{pmatrix}0 & -A\\\\ -A & 0\\end{pmatrix}$ is applied to the system. The correct pair of energy eigenvalue and corresponding eigenfunction of the perturbed system, according to first order perturbation theory will be,", 
+        o: ["$E_0 - A, \\frac{1}{\\sqrt{2}}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}$", "$E_0 + A, \\frac{1}{\\sqrt{2}}\\begin{pmatrix}1\\\\ 1\\end{pmatrix}$", "$E_0 - A, \\frac{1}{\\sqrt{2}}\\begin{pmatrix}1\\\\ 1\\end{pmatrix}$", "$E_0 + A, \\begin{pmatrix}1\\\\ 0\\end{pmatrix}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A particle is described by the following Hamiltonian $\\hat{H} = \\frac{\\hat{p}^2}{2m} + \\frac{1}{2}m\\omega^2 \\hat{x}^2 + b\\hat{x}^4$ where the quartic term can be treated as perturbation. If the energy of the particle is calculated using first order perturbation theory, then the energy separation between the first and second excited state of the particle, will be", 
+        o: ["$\\hbar\\omega + \\frac{6b\\hbar^2}{m^2 \\omega^2}$", "$\\hbar\\omega + \\frac{24b\\hbar^2}{m^2 \\omega^2}$", "$\\hbar\\omega + \\frac{15b\\hbar^2}{4m^2 \\omega^2}$", "$\\hbar\\omega + \\frac{12b\\hbar^2}{m^2 \\omega^2}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a scattering process in which only s and p waves need to be considered. If the incident beam has an energy $E_0$ and the phase shifts of s and p waves are $\\delta_0 = \\pi/6, \\delta_1 = \\pi/3$ then the total scattering cross section is equal to", 
+        o: ["$\\frac{\\pi\\hbar^2}{mE_0}$", "$\\frac{2\\pi\\hbar^2}{mE_0}$", "$\\frac{5\\pi\\hbar^2}{mE_0}$", "$\\frac{5\\pi\\hbar^2}{2mE_0}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider a spin 1/2 particle characterized by the Hamiltonian $H_0 = kS_z$. Under a perturbation $H^{\\prime} = \\lambda S_x$, the second order correction to the first excited state energy, is given by", 
+        o: ["$\\frac{\\lambda^2}{4\\hbar k}$", "$-\\frac{\\lambda^2}{4\\hbar k}$", "$\\frac{\\lambda^2}{2\\hbar k}$", "$-\\frac{\\lambda^2}{2\\hbar k}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The potential energy of a quantum system is described by $V(x) = \\beta|x|^r$ where $\\beta$ and r are positive constants. The ground state energy of the system will be proportional to,", 
+        o: ["$\\beta^{\\frac{2}{2+r}}$", "$\\beta^{\\frac{1}{2+r}}$", "$\\beta^{\\frac{2}{1+r}}$", "$\\beta^{\\frac{1}{1+r}}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    }
+];
+  
+
+
+
+// LOGIC
+var cQ=0, uA=[], qS=[], tInt;
+
+for(var i=0; i<qs.length; i++){ 
+    uA.push(null); 
+    qS.push('n-vis'); 
+}
+
+function iT(){
+    var p=document.getElementById('pal');
+    for(var i=0; i<qs.length; i++){
+        var b=document.createElement('div');
+        b.className='bub'; 
+        b.id='b-'+i; 
+        b.innerText=i+1;
+        (function(idx){ b.onclick=function(){lQ(idx);}; })(i);
+        p.appendChild(b);
+    }
+    lQ(0);
+}
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(3600);
+}
+
+function lQ(i){
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img !== "") {
+        imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    }
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){
+        if(window.MathJax) {
+            MathJax.typesetClear();
+            MathJax.typeset();
+        }
+    }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) {
+        if(ops[i].checked) return parseInt(ops[i].value);
+    }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+function sav(){
+    var sel=getSelected();
+    if(sel!==null){ uA[cQ]=sel; uS(cQ,'ans'); }
+    else { uS(cQ,'n-ans'); }
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function rev(){
+    uA[cQ]=getSelected(); 
+    uS(cQ,'rev');
+    if(cQ<qs.length-1) lQ(cQ+1);
+}
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0, ms=0;
+    for(var i=0; i<qs.length; i++){
+        ms+=qs[i].m;
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('m-sc').innerText=ms;
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
+        var cA = qs[j].o[qs[j].a];
+        
+        var qImgStr = "";
+        if(qs[j].img !== "") {
+            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        }
+        
+        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
+                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
+                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
+                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
+                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
+                        "</div>" +
+                    "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    
+    if(window.Chart) {
+        new Chart(document.getElementById('rc').getContext('2d'),{
+            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+        });
+    }
+}
+
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
