@@ -49,21 +49,24 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     
+    // TrebEdit/Mobile ke liye Error Fix
+    const db = firebase.firestore();
+    db.settings({ experimentalForceLongPolling: true });
+
     // Test page ko turant chupa do jab tak login verify na ho
     document.write("<style>body { display: none; }</style>");
     
     firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
-            // Agar login nahi hai, toh wapas main website ke login par bhej do
-            // Dhyan de: "../" lagaya hai kyunki test file folder ke andar hai
-            alert("Please login to access test!");
+            alert("Aapko test access karne ke liye pehle Login karna hoga!");
             window.location.href = "../index.html#login";
         } else {
-            // Agar asli user hai, toh body dikha do (Test start)
             document.body.style.display = "flex"; 
         }
     });
 </script>
+    
+    
     
 </head>
 <body>
@@ -381,48 +384,56 @@ function finalSubmit(force){
     document.getElementById('rc-a').innerText=acc.toFixed(2);
 
     // ==========================================================
-    // NAYA CODE: SAVE SCORE TO FIREBASE (PROFILE) & GOOGLE SHEET
+    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
     // ==========================================================
     try {
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            
-            // DHYAN DEIN: Test 2 mein isko "Quantum Mechanics - Test 2" kar dena
-            var testTitle = "Quantum Mechanics - Test 1"; 
+            var testTitle = "Quantum Mechanics - Test 1"; // Test ka naam
             var currentDate = new Date().toLocaleString();
-            var db = firebase.firestore();
-
-            // 1. Firebase (Student Profile) mein save karna
-            db.collection('students').doc(currentUser.uid).collection('marks').add({
-                testName: testTitle,
-                score: finalScore,
-                totalMarks: ms,
-                date: currentDate,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            // 2. Google Sheet par bhejna
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
             
-            db.collection('students').doc(currentUser.uid).get().then(doc => {
-                var stuName = (doc.exists && doc.data().fullName) ? doc.data().fullName : (currentUser.email || currentUser.phoneNumber);
-                
-                fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        name: stuName, 
-                        mobile: currentUser.email || currentUser.phoneNumber, 
-                        password: testTitle, // Password wale column mein Test ka naam jayega
-                        score: finalScore + " / " + ms // Agar extra column aapne banaya hoga sheet mein toh usme marks jayenge
-                    })
-                }).catch(err => console.log("Google Sheet Error: ", err));
-            });
+            // User ki pehchaan nikalna
+            var userIdentifier = "Student";
+            if(currentUser.email) {
+                userIdentifier = currentUser.email;
+            } else if (currentUser.phoneNumber) {
+                userIdentifier = currentUser.phoneNumber;
+            }
+
+            // --- 1. GOOGLE SHEET PAR BHEJNA ---
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: userIdentifier, 
+                    mobile: "Attempted at: " + currentDate, 
+                    password: combinedScoreData 
+                })
+            }).then(() => {
+                console.log("✅ Google Sheet mein score chala gaya!");
+            }).catch(err => console.log("Google Sheet Error: ", err));
+
+            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
+            try {
+                var db = firebase.firestore();
+                db.collection('students').doc(currentUser.uid).collection('marks').add({
+                    testName: testTitle,
+                    score: finalScore,
+                    totalMarks: ms,
+                    date: currentDate,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(dbErr) {
+                console.log("Database connection error.");
+            }
         }
     } catch(e) {
-        console.log("Firebase logic skipped or error: ", e);
+        console.log("Login check error: ", e);
     }
     // ==========================================================
 
@@ -454,9 +465,9 @@ function finalSubmit(force){
             type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
         });
     }
-       }
-    
+}
 
+// ==== DELETED HUA CODE WAPAS AAGAYA ====
 var cExp="";
 function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
 function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
