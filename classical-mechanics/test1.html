@@ -63,24 +63,21 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
                 alert("Please login to attempt the test!");
                 window.location.href = "../index.html#login";
             } else {
-                // NAYA: Admin Approval Check
+                // SIRF ADMIN APPROVAL CHECK (Kyunki Email verify karke hi yahan aaya hai)
                 db.collection('students').doc(user.uid).get().then((doc) => {
-                    if(doc.exists && doc.data().status === "Approved") {
-                        // Agar Yash Sir ne 'Approved' likha hai, tabhi test dikhega
+                    if (doc.exists && doc.data().status === "Approved") {
                         document.body.style.display = "flex"; 
                     } else {
-                        // Agar Pending hai, toh bahar nikal do
-                        alert("Access Denied! Please contact for accessing test");
+                        alert("🛑 ACCESS DENIED! please contact to accessing test.");
                         window.location.href = "../index.html"; 
                     }
                 }).catch(err => {
-                    console.log("Error checking permission: ", err);
+                    alert("Database Error: " + err.message);
                     window.location.href = "../index.html";
                 });
             }
         });
     </script>
-    
     
 </head>
 <body>
