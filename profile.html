@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Concept Cracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; display: none; }
+        header { background: var(--primary); color: white; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; }
+        .logo span { color: var(--accent); }
+        .btn-home { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; }
+        
+        .profile-container { max-width: 450px; margin: 60px auto; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+        .icon-wrapper { font-size: 70px; color: var(--secondary); margin-bottom: 20px; }
+        
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-group label { font-weight: bold; font-size: 14px; color: #555; }
+        .form-group input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .form-group input:disabled { background: #eee; cursor: not-allowed; }
+        
+        .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-save:hover { background: var(--secondary); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">CONCEPT <span>CRACKER</span></div>
+    <a href="subjects.html" class="btn-home"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+</header>
+
+<div class="profile-container">
+    <div class="icon-wrapper"><i class="fas fa-user-graduate"></i></div>
+    <h2 style="color:var(--primary); margin-top:0;">My Profile</h2>
+    <p style="color:#666; font-size:14px; margin-bottom:30px;">Manage your account details below.</p>
+
+    <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="p-name" placeholder="Enter your full name">
+    </div>
+    <div class="form-group">
+        <label>Registered Identity (Email / Phone)</label>
+        <input type="text" id="p-contact" disabled>
+    </div>
+    
+    <button class="btn-save" id="save-btn" onclick="saveProfile()">Update Profile</button>
+</div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      storageBucket: "concepts-creakres.firebasestorage.app",
+      messagingSenderId: "882506019552",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.body.style.display = "block";
+            currentUser = user;
+            document.getElementById('p-contact').value = user.email || user.phoneNumber;
+            
+            // Fetch name from database
+            db.collection('students').doc(user.uid).get().then((doc) => {
+                if (doc.exists && doc.data().fullName) {
+                    document.getElementById('p-name').value = doc.data().fullName;
+                }
+            });
+        } else {
+            window.location.href = "index.html"; // Agar login nahi hai toh wapas bhej do
+        }
+    });
+
+    function saveProfile() {
+        const name = document.getElementById('p-name').value;
+        const btn = document.getElementById('save-btn');
+        if(!name) { alert("Name cannot be empty!"); return; }
+        
+        btn.innerText = "Saving...";
+        btn.disabled = true;
+
+        db.collection('students').doc(currentUser.uid).set({ fullName: name }, { merge: true }).then(() => {
+            alert("Profile Updated Successfully!");
+            btn.innerText = "Update Profile";
+            btn.disabled = false;
+        }).catch(err => {
+            alert("Error updating profile.");
+            btn.innerText = "Update Profile";
+            btn.disabled = false;
+        });
+    }
+</script>
+</body>
+</html>
+
