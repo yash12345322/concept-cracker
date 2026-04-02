@@ -18,8 +18,8 @@
         .logo span { color: var(--accent); }
         .btn-home { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; }
         
-        .profile-container { max-width: 450px; margin: 60px auto; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-        .icon-wrapper { font-size: 70px; color: var(--secondary); margin-bottom: 20px; }
+        .profile-container { max-width: 500px; margin: 40px auto; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+        .icon-wrapper { font-size: 60px; color: var(--secondary); margin-bottom: 20px; }
         
         .form-group { text-align: left; margin-bottom: 20px; }
         .form-group label { font-weight: bold; font-size: 14px; color: #555; }
@@ -28,30 +28,37 @@
         
         .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
         .btn-save:hover { background: var(--secondary); }
+        
+        .score-item { background:#f8f9fa; padding:15px; margin-bottom:10px; border-radius:8px; border-left:4px solid var(--secondary); display:flex; justify-content:space-between; align-items:center; text-align:left;}
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo">CONCEPT <span>CRACKER</span></div>
-    <a href="subjects.html" class="btn-home"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <a href="subjects.html" class="btn-home"><i class="fas fa-arrow-left"></i> Dashboard</a>
 </header>
 
 <div class="profile-container">
     <div class="icon-wrapper"><i class="fas fa-user-graduate"></i></div>
     <h2 style="color:var(--primary); margin-top:0;">My Profile</h2>
-    <p style="color:#666; font-size:14px; margin-bottom:30px;">Manage your account details below.</p>
 
     <div class="form-group">
         <label>Full Name</label>
         <input type="text" id="p-name" placeholder="Enter your full name">
     </div>
     <div class="form-group">
-        <label>Registered Identity (Email / Phone)</label>
+        <label>Registered Identity</label>
         <input type="text" id="p-contact" disabled>
     </div>
-    
     <button class="btn-save" id="save-btn" onclick="saveProfile()">Update Profile</button>
+
+    <div style="margin-top: 40px; text-align: left; border-top: 2px solid #eee; padding-top: 20px;">
+        <h3 style="color:var(--primary); margin-bottom: 15px;"><i class="fas fa-trophy" style="color:var(--accent);"></i> My Test Scores</h3>
+        <ul id="score-list" style="list-style:none; padding:0; margin:0;">
+            <li style="color:#777; font-size:14px;">Loading your scores...</li>
+        </ul>
+    </div>
 </div>
 
 <script>
@@ -59,15 +66,12 @@
       apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
       authDomain: "concepts-creakres.firebaseapp.com",
       projectId: "concepts-creakres",
-      storageBucket: "concepts-creakres.firebasestorage.app",
-      messagingSenderId: "882506019552",
       appId: "1:882506019552:web:2a5357160294eae7afd685"
     };
 
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
     let currentUser = null;
 
     auth.onAuthStateChanged((user) => {
@@ -76,14 +80,37 @@
             currentUser = user;
             document.getElementById('p-contact').value = user.email || user.phoneNumber;
             
-            // Fetch name from database
+            // 1. Fetch User Name
             db.collection('students').doc(user.uid).get().then((doc) => {
                 if (doc.exists && doc.data().fullName) {
                     document.getElementById('p-name').value = doc.data().fullName;
                 }
             });
+
+            // 2. Fetch User Scores
+            db.collection('students').doc(user.uid).collection('marks').orderBy('timestamp', 'desc').get().then(snapshot => {
+                let list = document.getElementById('score-list');
+                list.innerHTML = "";
+                if(snapshot.empty) {
+                    list.innerHTML = "<li style='color:#777; font-size:14px;'>You haven't attempted any tests yet!</li>";
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    let data = doc.data();
+                    list.innerHTML += `
+                    <li class="score-item">
+                        <div>
+                            <div style="font-weight:bold; color:#333;">${data.testName}</div>
+                            <div style="font-size:12px; color:#888;"><i class="far fa-calendar-alt"></i> ${data.date}</div>
+                        </div>
+                        <div style="color:green; font-weight:bold; font-size:18px;">
+                            ${data.score} <span style="font-size:12px;color:#555;">/ ${data.totalMarks}</span>
+                        </div>
+                    </li>`;
+                });
+            });
         } else {
-            window.location.href = "index.html"; // Agar login nahi hai toh wapas bhej do
+            window.location.href = "index.html#login";
         }
     });
 
@@ -94,18 +121,12 @@
         
         btn.innerText = "Saving...";
         btn.disabled = true;
-
         db.collection('students').doc(currentUser.uid).set({ fullName: name }, { merge: true }).then(() => {
             alert("Profile Updated Successfully!");
             btn.innerText = "Update Profile";
             btn.disabled = false;
-        }).catch(err => {
-            alert("Error updating profile.");
-            btn.innerText = "Update Profile";
-            btn.disabled = false;
-        });
+        }).catch(err => { alert("Error updating profile."); btn.disabled = false; });
     }
 </script>
 </body>
 </html>
-
