@@ -5,25 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Subject | Concept Cracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
     <style>
         :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
         body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
-        
         header { background: var(--primary); color: white; padding: 20px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .logo { font-size: 22px; font-weight: bold; letter-spacing: 1px; }
         .logo span { color: var(--accent); }
-        .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; }
+        
+        .profile-btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; margin-right:10px; }
+        .logout-btn { background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
         .page-title { text-align: center; margin: 40px 0 20px; font-size: 28px; color: var(--primary); }
-        
         .grid-container { padding: 0 5% 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        
         .sub-card { background: var(--white); padding: 30px 20px; border-radius: 15px; text-align: center; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary); transition: 0.3s; display: block; }
         .sub-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 4px solid var(--accent); }
         .sub-card i { font-size: 40px; color: var(--secondary); margin-bottom: 15px; }
         .sub-card h3 { font-size: 18px; margin: 0; }
-        
-        /* Special formatting for combined and full length */
         .special-card { border-top: 4px solid var(--accent); background: #fffcf5; }
         .special-card i { color: var(--accent); }
     </style>
@@ -32,62 +33,50 @@
 
 <header>
     <div class="logo">CONCEPT <span>CRACKER</span></div>
-    <a href="index.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    
+    <div id="auth-nav">
+        <a href="index.html#login" class="profile-btn"><i class="fas fa-user-circle"></i> Login / Register</a>
+    </div>
 </header>
 
 <h2 class="page-title">Select Subject Module</h2>
 
 <div class="grid-container">
-    <a href="mathematical-physics/list.html" class="sub-card">
-        <i class="fas fa-calculator"></i>
-        <h3>Mathematical Physics</h3>
-    </a>
-    
-    <a href="quantum-mechenics/list.html" class="sub-card">
-        <i class="fas fa-atom"></i>
-        <h3>Quantum Mechanics</h3>
-    </a>
-    
-    <a href="classical-mechanics/list.html" class="sub-card">
-        <i class="fas fa-cogs"></i>
-        <h3>Classical Mechanics</h3>
-    </a>
-    
-    <a href="electrodynamics/list.html" class="sub-card">
-        <i class="fas fa-bolt"></i>
-        <h3>Electrodynamics</h3>
-    </a>
-    
-    <a href="nuclear-physics/list.html" class="sub-card">
-        <i class="fas fa-radiation"></i>
-        <h3>Nuclear & Particle Physics</h3>
-    </a>
-    
-    <a href="thermo-physics/list.html" class="sub-card">
-        <i class="fas fa-temperature-half"></i>
-        <h3>Thermo & Statistics</h3>
-    </a>
-    
-    <a href="solid-state/list.html" class="sub-card">
-        <i class="fas fa-cubes"></i>
-        <h3>Solid State Physics</h3>
-    </a>
-    
-    <a href="atomic-physics/list.html" class="sub-card">
-        <i class="fas fa-microscope"></i>
-        <h3>Atomic & Molecular</h3>
-    </a>
-
-    <a href="combined-tests/list.html" class="sub-card special-card">
-        <i class="fas fa-layer-group"></i>
-        <h3>Combined Mock Tests</h3>
-    </a>
-    
-    <a href="full-length-tests/list.html" class="sub-card special-card">
-        <i class="fas fa-file-signature"></i>
-        <h3>Full Length Mock Tests</h3>
-    </a>
+    <a href="mathematical-physics/list.html" class="sub-card"><i class="fas fa-calculator"></i><h3>Mathematical Physics</h3></a>
+    <a href="quantum-mechanics/list.html" class="sub-card"><i class="fas fa-atom"></i><h3>Quantum Mechanics</h3></a>
+    <a href="classical-mechanics/list.html" class="sub-card"><i class="fas fa-cogs"></i><h3>Classical Mechanics</h3></a>
+    <a href="electrodynamics/list.html" class="sub-card"><i class="fas fa-bolt"></i><h3>Electrodynamics</h3></a>
+    <a href="nuclear-physics/list.html" class="sub-card"><i class="fas fa-radiation"></i><h3>Nuclear & Particle Physics</h3></a>
+    <a href="thermo-physics/list.html" class="sub-card"><i class="fas fa-temperature-half"></i><h3>Thermo & Statistics</h3></a>
+    <a href="solid-state/list.html" class="sub-card"><i class="fas fa-cubes"></i><h3>Solid State Physics</h3></a>
+    <a href="atomic-physics/list.html" class="sub-card"><i class="fas fa-microscope"></i><h3>Atomic & Molecular</h3></a>
+    <a href="combined-tests/list.html" class="sub-card special-card"><i class="fas fa-layer-group"></i><h3>Combined Mock Tests</h3></a>
+    <a href="full-length-tests/list.html" class="sub-card special-card"><i class="fas fa-file-signature"></i><h3>Full Length Mock Tests</h3></a>
 </div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+      authDomain: "concepts-creakres.firebaseapp.com",
+      projectId: "concepts-creakres",
+      appId: "1:882506019552:web:2a5357160294eae7afd685"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+        const nav = document.getElementById('auth-nav');
+        if (user) {
+            nav.innerHTML = `
+                <a href="profile.html" class="profile-btn"><i class="fas fa-user-check"></i> Profile</a>
+                <button onclick="firebase.auth().signOut()" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            `;
+        } else {
+            nav.innerHTML = `<a href="index.html#login" class="profile-btn"><i class="fas fa-user-circle"></i> Login / Register</a>`;
+        }
+    });
+</script>
 
 </body>
 </html>
