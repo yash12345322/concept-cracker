@@ -59,25 +59,37 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
+                // 1. Agar login hi nahi hai
                 alert("Please login to attempt the test!");
                 window.location.href = "../index.html#login";
             } else {
-                // SIRF ADMIN APPROVAL CHECK (Kyunki Email verify karke hi yahan aaya hai)
-                db.collection('students').doc(user.uid).get().then((doc) => {
-                    if (doc.exists && doc.data().status === "Approved") {
-                        document.body.style.display = "flex"; 
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
                     } else {
-                        alert("🛑Access denied! Please contact support for the assessment test.");
-                        window.location.href = "../index.html"; 
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
                     }
-                }).catch(err => {
-                    alert("Database Error: " + err.message);
-                    window.location.href = "../index.html";
                 });
             }
         });
-    </script> 
-    
+    </script>
+ 
 </head>
 <body>
 
