@@ -60,7 +60,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
-                alert("Aapko test access karne ke liye pehle Login karna hoga!");
+                alert("please login to attempt test!");
                 window.location.href = "../index.html#login";
             } else {
                 document.body.style.display = "flex"; 
@@ -386,7 +386,7 @@ function sT(d){
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            var testTitle = "Quantum Mechanics - Test 1"; // Test ka naam
+            var testTitle = "Quantum Mechanics - Test 2"; // Test ka naam
             var currentDate = new Date().toLocaleString();
             
             // User ki pehchaan nikalna
