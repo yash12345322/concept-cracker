@@ -210,14 +210,17 @@
         const p = document.getElementById('reg-pass').value;
         if(!n || !e || !p) { alert("Please fill all fields"); return; }
         
-        auth.createUserWithEmailAndPassword(e, p).then((cred) => {
-            db.collection('students').doc(cred.user.uid).set({ fullName: n, email: e });
-            cred.user.sendEmailVerification().then(() => {
-                alert("Account Created! A verification link has been sent to your email.");
-                auth.signOut();
-                switchTab('email-login');
+                auth.createUserWithEmailAndPassword(e, p).then((cred) => {
+            // NAYA CODE: Naye bacche ka status default "Pending" rahega
+            db.collection('students').doc(cred.user.uid).set({ 
+                fullName: n, 
+                email: e,
+                status: "Pending" // Ye line ensure karegi ki direct access na mile
             });
-        }).catch(err => alert(err.message));
+            alert("Account Created Successfully! Please wait for Admin approval to access tests.");
+            window.location.href = "index.html"; // Wapas home par bhej do
+        }).catch(err => alert("Sign Up Error: " + err.message));
+        
     }
 
     // --- PHONE OTP AUTHENTICATION ---
