@@ -39,10 +39,6 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
 .s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
 </style>
 
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
@@ -52,43 +48,15 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         
-        // SABSE PEHLE PAGE HIDE KARO
-        document.write("<style>body { display: none; }</style>");
-        
         const db = firebase.firestore();
         db.settings({ experimentalForceLongPolling: true });
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (!user) {
-                // 1. Agar login hi nahi hai
-                alert("Please login to attempt the test!");
-                window.location.href = "../index.html#login";
-            } else {
-                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
-                user.reload().then(() => {
-                    if (user.emailVerified === false) {
-                        alert("Email not verified. Please check your inbox.");
-                        window.location.href = "../index.html";
-                    } else {
-                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
-                        db.collection('students').doc(user.uid).get().then((doc) => {
-                            if (doc.exists && doc.data().status === "Approved") {
-                                // Sab badhiya hai! Test open kardo
-                                document.body.style.display = "flex"; 
-                            } else {
-                                // Agar Pending hai ya Approved nahi hai
-                                alert("🛑 Access denied, please contact support for assessment test.");
-                                window.location.href = "../index.html"; 
-                            }
-                        }).catch(err => {
-                            alert("Database Error: " + err.message);
-                            window.location.href = "../index.html";
-                        });
-                    }
-                });
-            }
-        });
+        // 🚀 FREE TRIAL MODE: Security Guard (Login & Admin Approval) hata diya gaya hai.
+        // Ab koi bhi is test ko bina login ke de sakta hai!
     </script>
+   
+   
+  
 </head>
 <body>
 
@@ -367,28 +335,35 @@ function calculateAndShowResults() {
     // ==========================================================
     // SCORE SAVING (FIREBASE & GOOGLE SHEET)
     // ==========================================================
+        // ==========================================================
+    // SCORE SAVING (FIREBASE & GOOGLE SHEET) - TRIAL MODE SAFE
+    // ==========================================================
     try {
         var currentUser = firebase.auth().currentUser;
+        var finalScore = sc.toFixed(3);
+        var testTitle = document.title + " (FREE TRIAL)"; 
+        var currentDate = new Date().toLocaleString();
+        
+        // Agar login hai toh uska email, nahi toh "Trial Student"
+        var userIdentifier = currentUser ? (currentUser.email || currentUser.phoneNumber || "Student") : "Trial Student";
+
+        // Google Sheet mein sabka score jayega (Trial wale ka bhi)
+        var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+        var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                name: userIdentifier, 
+                mobile: "Attempted at: " + currentDate, 
+                password: combinedScoreData 
+            })
+        }).catch(err => console.log("Google Sheet Error: ", err));
+
+        // Firebase Data me sirf unka jayega jo Login hain
         if(currentUser) {
-            var finalScore = sc.toFixed(3);
-            var testTitle = "mathematical physics-test 1"; 
-            var currentDate = new Date().toLocaleString();
-            var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
-
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
-            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
-
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: userIdentifier, 
-                    mobile: "Attempted at: " + currentDate, 
-                    password: combinedScoreData 
-                })
-            }).catch(err => console.log("Google Sheet Error: ", err));
-
             var db = firebase.firestore();
             db.collection('students').doc(currentUser.uid).collection('marks').add({
                 testName: testTitle,
@@ -399,9 +374,10 @@ function calculateAndShowResults() {
             });
         }
     } catch(dbErr) {
-        console.log("Saving Error", dbErr);
+        console.log("Saving Error: ", dbErr);
     }
-
+    // ==========================================================
+   
     // --- SMART PAPER (COLOR CODED) RESULT LOGIC ---
     var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Paper Analysis:</h3>";
     
