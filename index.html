@@ -107,7 +107,7 @@
     <div class="logo">CONCEPT <span>CRACKER</span></div>
     <div class="nav-links">
         <a href="#">Home</a>
-        <a href="subjects.html">Tests</a>
+        <a href="exams.html">Tests</a>
         <a href="#mentor">Mentor</a>
         <a href="#contact">Contact</a>
     </div>
@@ -121,10 +121,10 @@
 
 <h2 class="section-title" id="dashboard">Learning Dashboard</h2>
 <div class="container">
-    <div class="card" onclick="window.location.href='subjects.html'">
+    <div class="card" onclick="window.location.href='exams.html'">
         <i class="fas fa-vial"></i>
-        <h3>CSIR Mock Tests</h3>
-        <p>Full length NTA style tests with detailed analysis and marking.</p>
+        <h3>Mock tests</h3>
+        <p>Physics Test Series with detailed analysis and marking.</p>
     </div>
     <div class="card" onclick="alert('Notes Section Coming Soon!')">
         <i class="fas fa-book-open"></i>
@@ -199,7 +199,7 @@
         if(!e || !p) { alert("Enter email and password!"); return; }
         
         auth.signInWithEmailAndPassword(e, p).then((cred) => {
-            if(cred.user.emailVerified) { window.location.href="subjects.html"; }
+            if(cred.user.emailVerified) { window.location.href="exams.html"; }
             else { alert("Please verify your email! Check your inbox."); auth.signOut(); }
         }).catch(err => alert("Invalid Email or Password!"));
     }
@@ -217,7 +217,7 @@
                 alert("🛑 EMAIL NOT VERIFIED!\n\n please verify your email, check your inbox and spam folder to verify email.");
             } else {
                 // Verify hai toh andar aane do
-                window.location.href="subjects.html"; 
+                window.location.href="exams.html"; 
             }
         }).catch(err => alert("Login Error: " + err.message));
     }
@@ -285,7 +285,7 @@
                     db.collection('students').doc(result.user.uid).set({ phone: result.user.phoneNumber, fullName: "New Student" });
                 }
             });
-            window.location.href = "subjects.html";
+            window.location.href = "exams.html";
         }).catch((err) => { alert("Invalid OTP!"); });
     }
 </script>
