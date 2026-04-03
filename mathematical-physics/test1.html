@@ -155,9 +155,7 @@ button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px
         <h3 style="margin-top:0">Question Palette</h3>
         <div class="pal" id="pal"></div>
         <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
-
-
-<div id="res">
+    </div> </div> <div id="res">
     <div class="r-box">
         <h2>Test Submitted Successfully!</h2>
         <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">0</span></h1>
@@ -247,7 +245,7 @@ function sT(d){
         document.getElementById('time').innerText=m+":"+s;
         if(--t<0){
             clearInterval(tInt);
-            finalSubmit(true); // YAHAN CHANGE KIYA HAI
+            finalSubmit(true); 
         }
     },1000);
 }
@@ -257,7 +255,6 @@ function tCal(){var c=document.getElementById('calc');c.style.display=c.style.di
 function cI(v){cS+=v;document.getElementById('cd').value=cS;}
 function cC(){cS="";document.getElementById('cd').value="";}
 function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;}catch(e){document.getElementById('cd').value="Err";cS="";}}
-
 function finalSubmit(force){
     if(!force && !confirm("Are you sure you want to submit the test?")) return;
     clearInterval(tInt);
