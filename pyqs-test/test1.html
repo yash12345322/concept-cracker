@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSIR NET Quantum Mechanics Test 1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+/* ... Purani CSS ... */
+#inst{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f4f4f4;padding:20px;box-sizing:border-box}
+.i-box{max-width:800px;background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);font-size:15px;line-height:1.6;max-height:90vh;overflow-y:auto}
+#test{display:none}
+body{font-family:sans-serif;margin:0;display:flex;flex-direction:column;height:100vh;background:#f4f4f4}
+header{background:#003366;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.main{display:flex;flex:1;overflow:hidden}
+.left{flex:3;padding:20px;overflow-y:auto;background:#fff;border-right:2px solid #ddd}
+.right{flex:1;padding:15px;background:#eef2f5;overflow-y:auto}
+.meta{font-weight:bold;color:#555;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.q-txt{font-size:18px;margin-bottom:15px;line-height:1.5}
+.q-img{max-width:100%;margin-top:10px}
+.opts{list-style:none;padding:0}
+.opts li{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.opts label{display:flex;padding:12px;cursor:pointer}
+.opts input{margin-right:15px;transform:scale(1.2)}
+.btn-grp{margin-top:20px;display:flex;gap:10px}
+button{padding:10px 15px;border:none;color:#fff;cursor:pointer;border-radius:4px;font-weight:bold;transition:0.3s}
+.b-sav{background:#28a745} .b-rev{background:#ffc107;color:#000} .b-clr{background:#dc3545} .b-sub{background:#003366;width:100%;padding:15px;margin-top:20px}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.bub{width:35px;height:35px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:1px solid #aaa;background:#fff;cursor:pointer}
+.ans{background:#28a745;color:#fff;border-color:#28a745} .n-ans{background:#dc3545;color:#fff;border-color:#dc3545} .rev{background:#6f42c1;color:#fff;border-color:#6f42c1}
+#calc{display:none;background:#333;padding:10px;border-radius:5px;margin-bottom:15px}
+#c-disp{width:100%;padding:5px;margin-bottom:5px;text-align:right;font-size:18px}
+.c-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.c-grid button{background:#555;padding:8px;color:#fff;border:none;border-radius:3px} .c-grid .op{background:#ff9800}
+#res{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:100;overflow-y:auto;padding:30px;box-sizing:border-box}
+.r-box{max-width:800px;margin:0 auto;text-align:center}
+.chart{width:300px;margin:20px auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:18px}
+.s-box{padding:15px;background:#f8f9fa;border:1px solid #ddd;border-radius:6px}
+
+/* NAYA CODE: PART TABS KI CSS */
+.sec-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid #003366; padding-bottom: 0px; }
+.sec-tabs button { padding: 10px 20px; border: 1px solid #ccc; border-bottom: none; background: #eef2f5; color: #333; font-weight: bold; cursor: pointer; border-radius: 6px 6px 0 0; }
+.sec-tabs button.active { background: #003366; color: #fff; border-color: #003366; }
+</style>
+ <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAy5qO8AI8kWqQQUSDqPCqm2Z6tSCckia4",
+          authDomain: "concepts-creakres.firebaseapp.com",
+          projectId: "concepts-creakres",
+          appId: "1:882506019552:web:2a5357160294eae7afd685"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        // SABSE PEHLE PAGE HIDE KARO
+        document.write("<style>body { display: none; }</style>");
+        
+        const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // 1. Agar login hi nahi hai
+                alert("Please login to attempt the test!");
+                window.location.href = "../index.html#login";
+            } else {
+                // 2. CHECK: Kya bacche ne apna Email verify kiya hai?
+                // user.reload() use kar rahe hain taaki latest verification status mile
+                user.reload().then(() => {
+                    if (user.emailVerified === false) {
+                        alert("email not verified.");
+                        window.location.href = "../index.html";
+                    } else {
+                        // 3. CHECK: Kya Yash Sir ne "Approved" kiya hai?
+                        db.collection('students').doc(user.uid).get().then((doc) => {
+                            if (doc.exists && doc.data().status === "Approved") {
+                                // Sab badhiya hai! Test open kardo
+                                document.body.style.display = "flex"; 
+                            } else {
+                                // Agar Pending hai ya Approved nahi hai
+                                alert("🛑 Access denied, please contact support for assessment test.");
+                                window.location.href = "../index.html"; 
+                            }
+                        }).catch(err => {
+                            alert("Database Error: " + err.message);
+                            window.location.href = "../index.html";
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+<div id="inst">
+    <div class="i-box">
+        <h2 style="text-align:center; color:#003366; margin-top:0;">CSIR-UGC NET MOCK TEST</h2>
+        <h3 style="text-align:center; color:#444;">Subject: Quantum Mechanics</h3>
+        <hr>
+        <b>Please read the instructions carefully:</b>
+        <ol>
+            <li>The total duration of the examination is <b>60 minutes</b>.</li>
+            <li><b>Part A (Q.1 to Q.20):</b> Max 15 attempts. (+2 Marks, -0.5 Negative)</li>
+            <li><b>Part B (Q.21 to Q.45):</b> Max 20 attempts. (+3.5 Marks, -0.875 Negative)</li>
+            <li><b>Part C (Q.46 to Q.75):</b> Max 20 attempts. (+5 Marks, -1.25 Negative)</li>
+            <li>You can switch between sections using the tabs on the top.</li>
+        </ol>
+        <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24; margin-top:20px;">
+            <label style="cursor:pointer; font-size:16px; font-weight:bold; display:flex; gap:10px;">
+                <input type="checkbox" style="transform:scale(1.5); margin-top:4px;" onchange="var b=document.getElementById('start-btn'); b.disabled=!this.checked; b.style.opacity=this.checked?'1':'0.5';"> 
+                I have read and understood the instructions. I agree to the terms.
+            </label>
+        </div>
+        <button id="start-btn" class="b-sub" style="font-size:18px; opacity:0.5;" onclick="startTest()" disabled>I am ready to begin</button>
+    </div>
+</div>
+
+<header><h2>Physics Mock Test</h2><div>Time Left: <span id="time">60:00</span></div></header>
+
+<div class="main" id="test">
+    <div class="left">
+        <div class="sec-tabs">
+            <button id="tab-A" onclick="switchSec('A')">PART A</button>
+            <button id="tab-B" onclick="switchSec('B')">PART B</button>
+            <button id="tab-C" onclick="switchSec('C')">PART C</button>
+        </div>
+        
+        <div class="meta">Question No. <span id="qn">1</span> | Marks: <span id="qm" style="color:green">3</span> | Negative: <span id="qn-m" style="color:red">-0.875</span></div>
+        <div id="qt" class="q-txt">Loading...</div>
+        <div id="qi"></div>
+        <ul class="opts" id="ol"></ul>
+        <div class="btn-grp">
+            <button class="b-sav" onclick="sav()">Save & Next</button>
+            <button class="b-rev" onclick="rev()">Mark Review & Next</button>
+            <button class="b-clr" onclick="clr()">Clear Response</button>
+        </div>
+    </div>
+    <div class="right">
+        <button class="b-rev" style="width:100%;margin-bottom:10px" onclick="tCal()">Scientific Calculator</button>
+        <div id="calc">
+            <input type="text" id="cd" disabled>
+            <div class="c-grid">
+                <button onclick="cI('Math.sin(')">sin</button><button onclick="cI('Math.cos(')">cos</button><button onclick="cI('Math.tan(')">tan</button><button class="op" onclick="cC()">C</button>
+                <button onclick="cI('Math.log(')">ln</button><button onclick="cI('Math.exp(')">exp</button><button onclick="cI('Math.PI')">π</button><button class="op" onclick="cI('/')">/</button>
+                <button onclick="cI('7')">7</button><button onclick="cI('8')">8</button><button onclick="cI('9')">9</button><button class="op" onclick="cI('*')">*</button>
+                <button onclick="cI('4')">4</button><button onclick="cI('5')">5</button><button onclick="cI('6')">6</button><button class="op" onclick="cI('-')">-</button>
+                <button onclick="cI('1')">1</button><button onclick="cI('2')">2</button><button onclick="cI('3')">3</button><button class="op" onclick="cI('+')">+</button>
+                <button onclick="cI('0')">0</button><button onclick="cI('.')">.</button><button onclick="cI(')')">)</button><button class="op" onclick="cE()">=</button>
+            </div>
+        </div>
+        <h3 style="margin-top:0">Question Palette</h3>
+        <div class="pal" id="pal"></div>
+        <button class="b-sub" onclick="finalSubmit(false)">Final Submit Test</button>
+    </div>
+</div>
+
+<div id="feedback-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:25px; border-radius:12px; width:90%; max-width:450px; text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+        <h2 style="color:#003366; margin-top:0;">Test Completed! 🎉</h2>
+        <p style="color:#555; margin-bottom:20px;">Please share your experience to help us improve.</p>
+        
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>1. Overall Test Experience:</b>
+            <div id="star-exp" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('exp', 1)">★</span><span onclick="setRating('exp', 2)">★</span><span onclick="setRating('exp', 3)">★</span><span onclick="setRating('exp', 4)">★</span><span onclick="setRating('exp', 5)">★</span>
+            </div>
+        </div>
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>2. Technical Smoothness:</b>
+            <div id="star-tech" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('tech', 1)">★</span><span onclick="setRating('tech', 2)">★</span><span onclick="setRating('tech', 3)">★</span><span onclick="setRating('tech', 4)">★</span><span onclick="setRating('tech', 5)">★</span>
+            </div>
+        </div>
+        <div style="text-align:left; margin-bottom:15px;">
+            <b>3. Quality of Questions:</b>
+            <div id="star-qual" style="font-size:30px; color:#ccc; cursor:pointer;">
+                <span onclick="setRating('qual', 1)">★</span><span onclick="setRating('qual', 2)">★</span><span onclick="setRating('qual', 3)">★</span><span onclick="setRating('qual', 4)">★</span><span onclick="setRating('qual', 5)">★</span>
+            </div>
+        </div>
+        
+        <textarea id="feedback-comment" rows="3" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:10px; box-sizing:border-box;" placeholder="Any comments? (Optional)"></textarea>
+        
+        <button onclick="submitFeedbackAndShowResult()" style="background:#28a745; color:#fff; width:100%; padding:12px; border:none; border-radius:5px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:15px;">Submit & View Results</button>
+        <button onclick="calculateAndShowResults()" style="background:none; border:none; color:#007bff; text-decoration:underline; cursor:pointer; margin-top:10px; font-size:14px;">Skip & View Results</button>
+    </div>
+</div>
+
+<div id="res">
+    <div class="r-box">
+        <h2>Test Submitted Successfully!</h2>
+        <h1>Your Score: <span id="f-sc" style="color:#003366">0</span> / <span id="m-sc">200</span></h1>
+        <div class="chart"><canvas id="rc"></canvas></div>
+        <div class="stats">
+            <div class="s-box" style="color:#28a745">Correct: <span id="rc-c">0</span></div>
+            <div class="s-box" style="color:#dc3545">Incorrect: <span id="rc-i">0</span></div>
+            <div class="s-box" style="color:#6f42c1">Unattempted: <span id="rc-u">0</span></div>
+            <div class="s-box" style="color:#007bff">Accuracy: <span id="rc-a">0</span>%</div>
+        </div>
+        <button style="margin-top:30px" class="b-sub" onclick="location.reload()">Take Test Again</button>
+        <div id="detailed-res" style="margin-top:30px; border-top:2px solid #ddd; padding-top:20px; text-align:left;"></div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+var qs = [
+    // ==========================================
+    // PART A (Q.1 to Q.20) | Marks: +2, Negative: -0.5
+    // ==========================================
+    { 
+        q: "Three friends, Mr. Rahman, Mr. George and Mr. Vedant, met after a long time. They were wearing red, green and violet colour shirts. Mr. Rahman and the person wearing violet shirt noticed that none of the three is wearing a colour that starts with same letter as his name. Which one of the following is the correct match of the persons with the colour of their shirts?", 
+        o: ["Rahman-Violet, George-Red, Vedant-Green", "Rahman-Green, George-Violet, Vedant-Red", "Rahman-Green, George-Red, Vedant-Violet", "Rahman-Red, George-Violet, Vedant-Green"], 
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Kavita starts from her house and walks 200 m northward, then turns $45^{\\circ}$ right and walks 70 m. After that, she turns $90^{\\circ}$ right and walks 70 m. Which of the following is the closest value of the shortest distance between Kavita's current location and her house?", 
+        o: ["296 m", "240 m", "200 m", "223 m"], 
+        a: 3, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "In a code, the word DELTOID is written as 3152893. Then LOTION could be written as:", 
+        o: ["582986", "582981", "198396", "198392"], 
+        a: 0, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Consider the following statements:<br>Statement-I: All Booklets are Manuals.<br>Statement-II: All Manuals are Catalogues.<br>If statements-I and II are True, which one of the following conclusions can be conclusively drawn?", 
+        o: ["All Manuals are Booklets.", "All Catalogues are Booklets.", "All Booklets are Catalogues.", "All Catalogues are Manuals."], 
+        a: 2, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "A car has wheels of diameter 36 cm. If it runs at a speed of $60~km/h$ then the rotation per minute (RPM) will be closest to:", 
+        o: ["884", "898", "906", "986"], 
+        a: 0, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "The initial monthly salaries of employees John, Riya and Sunil were in the proportion 4:3:5. After an increase of Rs. 10000 monthly to all, the new proportion becomes 6:5:7. What was the initial salary of Sunil?", 
+        o: ["Rs. 20000", "Rs. 25000", "Rs. 30000", "Rs. 35000"], 
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "The given Venn diagram shows numbers of players playing one or more than one sport. The percentage of players who play exactly two sports is closest to:", 
+        o: ["5%", "14%", "28%", "32%"], 
+        a: 2, m: 2, n: 0.5, img: "" // Venn diagram image needed here
+    },
+    { 
+        q: "The market share (%) and annual production of scooters from five automobile companies P, Q, R, S and T are shown in graphs. If the profit of a company is directly proportional to the ratio of market share to production, then which of the following statements is/are correct?<br>Statement X: Companies T and P have same profit.<br>Statement Y: Company R has the maximum profit.<br>Statement Z: Company S has the minimum profit.", 
+        o: ["X and Y", "X and Z", "Y and Z", "Only Z"], 
+        a: 2, m: 2, n: 0.5, img: "" // Pie chart and Bar graph image needed here
+    },
+    { 
+        q: "Numbers of Rose, Lotus, and Marigold plants in a garden are in the proportion 8:5:7. Later, 75%, 40% and 50% more plants of their respective categories were added. What will be the new proportion of plants, in the same order?", 
+        o: ["$5:3:4$", "$4:2:3$", "$5:4:3$", "$7:4:5$"], 
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "The value of a company is measured as the total value of its shares owned by different investors. Rakesh owns $2/15$ of the shares of a company. He sells $1/3$ of his shares for Rs. 75,000. What is the total value of the company at that time?", 
+        o: ["Rs. 15,75,800", "Rs. 16,87,500", "Rs. 17,75,800", "Rs. 18,27,500"], 
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "What will be the digit at the unit's place of $1^{3}+2^{3}+3^{3}+4^{3}+5^{3}+6^{3}+7^{3}+8^{3}+9^{3}$?", 
+        o: ["0", "5", "1", "9"], // Reordered naturally since options were missing from OCR but answer is (b) -> typically 5.
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "A stock market trader has lost two-thirds of her investment on a day. Next day she recovered one-third of the previous day's loss. What fraction of her initial investment is she left with?", 
+        o: ["$\\frac{1}{3}$", "$\\frac{2}{3}$", "$\\frac{2}{9}$", "$\\frac{5}{9}$"], 
+        a: 3, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "The following diagram represents the relationship between four categories. The categories could be:", 
+        o: ["Rivers, water bodies, oceans, sources of evaporation.", "Parliamentarians, celebrities, elected persons, professional politicians.", "Monkeys, four-legged animals, pet animals, land animals.", "Furniture, chairs, seats, wooden objects."], 
+        a: 3, m: 2, n: 0.5, img: "" // Diagram image needed here
+    },
+    { 
+        q: "A number is mistakenly divided by 2 instead of being multiplied by 2. What is the change in the result caused by this mistake?", 
+        o: ["25%", "50%", "75%", "100%"], 
+        a: 2, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Suresh asked Ramesh to identify the person in a photo that the latter is holding. Ramesh responds, \"I have no brothers or sisters. However, that man's father is my father's son\". Who is the person in the photo?", 
+        o: ["Suresh", "Ramesh", "Ramesh's son", "Ramesh's cousin"], 
+        a: 2, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "A cylindrical container of radius 20 cm was filled with water up to 25 cm height. A solid spherical ball of radius 7 cm was then immersed in the water. What would by the approximate increase in water level in the container after the ball was fully immersed?", 
+        o: ["1.14 cm", "2.28 cm", "5.50 cm", "7.00 cm"], 
+        a: 0, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Rahul and his father started jogging on a circular track of radius $r (r>2)$. Rahul completed one round and stopped. His father got tired half-way into the first round and returned to his starting point along a straight line. What is the ratio of the distances covered by Rahul and his father?", 
+        o: ["$\\pi r/(\\pi+2)$", "$2\\pi/(\\pi+2)$", "1", "2"], 
+        a: 1, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Sum of the digits of a two-digit number 'ab' is subtracted from the number and the result is divided by 9. Then the result of this will be :", 
+        o: ["always a", "always b", "neither a nor b", "either a or b depending on $a+b$"], 
+        a: 0, m: 2, n: 0.5, img: "" 
+    },
+    { 
+        q: "Three identical semi-circles are arranged as shown. What is the diameter of the semi-circles?", 
+        o: ["$5\\pi$", "20", "$\\frac{15\\pi}{2}$", "25"], 
+        a: 1, m: 2, n: 0.5, img: "" // Semi-circle image needed
+    },
+    { 
+        q: "A circle of radius 1 unit is divided into four quarters and rejoined as shown below: What is the area of this shape?", 
+        o: ["$\\pi$", "1", "2", "4"], 
+        a: 2, m: 2, n: 0.5, img: "" // Shape image needed
+    },
+
+    // ==========================================
+    // PART B (Q.21 to Q.45) | Marks: +3.5, Negative: -0.875
+    // ==========================================
+    { 
+        q: "Let $R_{A}$ and $R_{B}$ be the resistances of a channel determined (by taking the ratio of the voltage measured and current flowing) using configurations A and B respectively, as shown in the figure. In both configurations each lead resistance is $5~\\Omega$ and each contact resistance is $10~\\Omega$. The channel has a resistivity of $20~\\Omega/mm$. Considering the voltmeter and the current source as ideal devices, the ratio $R_{B}/R_{A}$ is:", 
+        o: ["1.1", "1.2", "1.3", "1.5"], 
+        a: 2, m: 3.5, n: 0.875, img: "" // Configurations image needed
+    },
+    { 
+        q: "The Hamiltonian of the 1-dimensional quantum harmonic oscillator is given by:<br>$H=\\frac{p^{2}}{2m}+\\frac{1}{2}m\\omega^{2}x^{2}$<br>The expectation value of $[D, H]$ in the ground state, where $D=\\frac{1}{2\\hbar}(xp+px)$ is: (in units of $\\hbar\\omega$)", 
+        o: ["i", "$\\frac{1}{2}$", "$\\frac{-3i}{2}$", "0"], 
+        a: 3, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particles of mass m is subjected to a potential $V(x)=V_{0}\\Theta(x)-kx$, where $V_{0}$ and k are positive constants and $V_{0}$ is much larger than the energy of the particle. The function $\\Theta(x)=1$ for $x\\ge0$ and equals 0 otherwise. The particle starts from rest at $x=-5$ and $t=0$. In the limit $t \\rightarrow \\infty$, the graph for $\\dot{x}(t)$ is best represented by:", 
+        o: ["Graph (a)", "Graph (b)", "Graph (c)", "Graph (d)"], 
+        a: 1, m: 3.5, n: 0.875, img: "" // Graph image needed here
+    },
+    { 
+        q: "A spin-1/2 system is prepared in the initial state $|\\phi\\rangle=\\frac{\\sqrt{3}}{2}|\\uparrow\\rangle+\\frac{1}{2}|\\downarrow\\rangle$, where $|\\uparrow\\rangle$ and $|\\downarrow\\rangle$ are eigenstates of $\\hat{S}_{z}$ with eigenvalues $+\\frac{\\hbar}{2}$ and $-\\frac{\\hbar}{2}$ respectively. A measurement of $\\hat{S}_{x}$ is allowed by a measurement of $\\hat{S}_{z}$ on the system. What is the probability that the measurement of $\\hat{S}_{x}$ yields a value $+\\frac{\\hbar}{2}$?", 
+        o: ["$\\frac{1}{2}$", "$\\frac{2+\\sqrt{3}}{4}$", "$\\frac{2-\\sqrt{3}}{4}$", "$\\frac{3}{8}$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "The internal energy of a system is given by $U=g(N)V^{-2/3} \\exp\\left[\\frac{2S}{3NR}\\right]$ where V is the volume, S is the entropy, N is the number of molecules and R is a constant. The function $g(N)$ is proportional to:", 
+        o: ["$N^{5/3}$", "$N^{1/3}$", "$N^{2/3}$", "N"], 
+        a: 0, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "For the function $f(z)=\\exp\\left[z-1+\\frac{1}{z-1}\\right]$,", 
+        o: ["$z=1$ is a pole of order one.", "$z=1$ is an essential singularity.", "$z=1$ is a pole of order two.", "$z=1$ is a removable singular point."], 
+        a: 1, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A Silicon p-n junction diode is operated under forward bias at two temperature $T_{hi}\\approx300~K$, (Shown by solid line) and $T_{lo}\\approx200~K$, (shown by dotted line). Which of the following plots best represents the I-V characteristics of the diode?", 
+        o: ["Plot (a)", "Plot (b)", "Plot (c)", "Plot (d)"], 
+        a: 1, m: 3.5, n: 0.875, img: "" // Plot image needed
+    },
+    { 
+        q: "A circular loop of radius a (in the x-y plane) and a square loop of side b (in the x-z plane) are kept at a distance r. Both carry current I as shown in the figure. If $r\\gg a, b$, the torque exerted on the square loop by the circular loop is:", 
+        o: ["$-\\frac{\\mu_{0}}{4\\pi}\\frac{1}{r^{3}}\\pi a^{2}b^{2}I^{2}\\hat{z}$", "0", "$\\frac{\\mu_{0}}{4\\pi}\\frac{1}{r^{3}}\\pi a^{2}b^{2}I^{2}\\hat{x}$", "$-\\frac{\\mu_{0}}{4\\pi}\\frac{1}{r^{3}}\\pi a^{2}b^{2}I^{2}\\hat{x}$"], 
+        a: 3, m: 3.5, n: 0.875, img: "" // Loops image needed
+    },
+    { 
+        q: "A 1 km long optical fiber of core and clad refractive indices 1.62 and 1.52, respectively, is laid in a straight line. Several identical light pulses are launched simultaneously from air on the entrance of this fiber from different angles about its axis. The diameter of the fiber is small compared to its length. The maximum time difference between the pulses emerging at the other end of the fiber would be closest to:", 
+        o: ["355 ns", "317 ns", "5.40 $\\mu$s", "5.75 $\\mu$s"], 
+        a: 0, m: 3.5, n: 0.875, img: "" // Fiber image needed
+    },
+    { 
+        q: "Consider one mole of an ideal diatomic gas molecule at temperature T such that $k_{B}T\\gg hv$, where v is the frequency of its vibrational mode. If $C_{p}$ and $C_{v}$ are specific heats of this gas at constant pressure and volume respectively, then the ratio $\\gamma=\\frac{C_{p}}{C_{v}}$ is:", 
+        o: ["2", "$\\frac{7}{5}$", "$\\frac{5}{3}$", "$\\frac{9}{7}$"], 
+        a: 3, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A refrigerator can be thought to be a reversible engine operating between $T_{2}=20^{\\circ}C$ and $T_{1}=-10^{\\circ}C$. The work needed to run this is supplied by another engine, that takes in energy at the rate of 500 W and runs with 50% efficiency. If the refrigerator freezes 5 kg of water at $0^{\\circ}C$ (latent heat $Q_{L}=334~kJ/kg$ for ice) in n hours, then n is closest to:", 
+        o: ["0.4", "0.3", "0.1", "0.2"], 
+        a: 3, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A particle of mass m is in the third energy eigenstate of an infinite potential well of width a. The time interval in which the phase of this wave function changes by $2\\pi$ is:", 
+        o: ["$\\frac{4ma^{2}}{3\\pi\\hbar}$", "$\\frac{4ma^{2}}{9\\pi\\hbar}$", "$\\frac{8ma^{2}}{3\\pi\\hbar}$", "$\\frac{8ma^{2}}{9\\pi\\hbar}$"], 
+        a: 1, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "In a particular inertial frame, electric field $\\vec{E}$ and magnetic field $\\vec{B}$ are: $\\vec{E}=E_{0}\\hat{y}$, $\\vec{B}=\\frac{E_{0}}{2c}\\hat{x}$. Which of the following statements is true?", 
+        o: ["There exists an inertial frame where $\\vec{E}=0$, $\\vec{B}\\ne0$", "There exists no inertial frame where either $\\vec{E}=0$ or $\\vec{B}=0$", "There exists an inertial frame where $\\vec{B}=0$, $\\vec{E}\\ne0$", "There exists an inertial frame where both $\\vec{E}=0$ and $\\vec{B}=0$"], 
+        a: 1, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "There are two boxes, one at the ground level, and the other at a fixed height h. There are three balls of different colours, each having mass m and radius $r\\ll h$. There is no restriction on the number of balls that can be simultaneously put in a given box. For a given value of the total energy E (in units of mgh), the number of accessible microstates is $\\Omega(E)$. The plot of $\\Omega(E)$ vs E is:", 
+        o: ["Plot (a)", "Plot (b)", "Plot (c)", "Plot (d)"], 
+        a: 2, m: 3.5, n: 0.875, img: "" // Microstates graph image needed
+    },
+    { 
+        q: "For the matrix $A=\\begin{bmatrix}2&-1&0\\\\ -1&3&1\\\\ 0&1&0\\end{bmatrix}$, which of the following is true?", 
+        o: ["$A^{3}=5A^{2}-4A-2I$", "$A^{3}=4A^{2}-6A+3I$", "$A^{3}=5A^{2}-5A-I$", "$A^{3}=8A^{2}+3A-4I$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A plane electromagnetic wave $\\vec{E}_{I} \\cos(k_{z}z+\\omega t)$ is incident normally on a perfectly reflecting mirror in vacuum. If the permittivity of free space is $\\epsilon_{0}$, the force exerted on an area A of the mirror would be:", 
+        o: ["$A\\epsilon_{0}|\\vec{E}_{I}|^{2}\\hat{z}$", "$-\\frac{A\\epsilon_{0}}{2}|\\vec{E}_{I}|^{2}\\hat{z}$", "$\\frac{A\\epsilon_{0}}{2}|\\vec{E}_{I}|^{2}\\hat{z}$", "$-A\\epsilon_{0}|\\vec{E}_{I}|^{2}\\hat{z}$"], 
+        a: 3, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "The solutions of the differential equation, $\\frac{dy}{dx}=-\\frac{x}{y+1}$ are a family of-", 
+        o: ["ellipses with different eccentricities.", "circles with different centres.", "circles with different radii.", "ellipses with different foci."], 
+        a: 2, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A sphere of radius R is held fixed on the horizontal ground. A point particles of mass m slides without friction from the top under the action of earth's gravity, as shown in the figure. The speed of the particle when it leaves the surface of the system is:", 
+        o: ["$\\sqrt{\\frac{2}{3}gR}$", "$\\sqrt{\\frac{3}{4}gR}$", "$\\sqrt{2gR}$", "$\\sqrt{gR}$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" // Sphere image needed
+    },
+    { 
+        q: "Consider the earth to be a free rigid body symmetric about its north-south (z) axis. If the principal moments of inertia satisfy $I_{z}=1.003~I_{x}$, then its angular velocity (in the body fixed frame) would precess about the z-axis with a period of nearly", 
+        o: ["167 days", "333 days", "556 days", "667 days"], 
+        a: 1, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "The circuit, composed of npn transistors of high $\\beta$, resistors and switches, is shown in the figure. The biasing is sufficient to turn on the transistors when respective switches S1 and S2 are closed. The voltage across the resistor $R_{x}=100~k\\Omega$ is:", 
+        o: ["~5 V when both S1 and S2 are closed.", "~5 V when either S1 or S2 are closed.", "~5 V when both S1 and S2 are open.", "~0 V when both S1 and S2 are open."], 
+        a: 2, m: 3.5, n: 0.875, img: "" // Circuit image needed
+    },
+    { 
+        q: "Consider the device D shown in the figure below. Its current-voltage characteristic is given by $I=aV+bV^{2}$, where I is the current, V is the input voltage, and a & b are constants. The device is used to mix a voltage signal $V=V_{DC}+V_{AC}$, where $V_{AC}=V_{0} \\cos \\omega t$. $V_{DC}$ and $V_{0}$ are constants. The frequency components presents in the current I are:", 
+        o: ["$0, \\omega$ and $2\\omega$", "$0$ and $2\\omega$", "$0$ and $\\omega$", "$\\omega$ and $2\\omega$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" // Device D circuit image needed
+    },
+    { 
+        q: "The value of the integral $\\int_{1}^{e}dy\\int_{0}^{5}dx\\delta(x^{2}-y^{2})\\ln(xy)$ is :", 
+        o: ["$\\frac{1}{2}$", "$\\frac{1}{3}$", "$\\frac{1}{e}$", "$\\frac{e}{5}$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "The Hamiltonian of a system is given by: $H(x,p)=-[p^{2}+V^{2}(x)]^{1/2}$ where x and p are generalized coordinate and momentum respectively and $V(x)\\ge0$. The corresponding Lagrangian is:", 
+        o: ["$-V(x)\\sqrt{1-\\dot{x}^{2}}$", "$-\\frac{V(x)}{\\sqrt{1-\\dot{x}^{2}}}$", "$V(x)\\sqrt{1-\\dot{x}^{2}}$", "$\\frac{V(x)}{\\sqrt{1-\\dot{x}^{2}}}$"], 
+        a: 2, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "A system consists of two non-interacting identical spin-$1/2$ particles. The spatial wave-functions for the individual particles are given by $\\phi_{1}(x)$ and $\\phi_{2}(x)$. Let $x_{1}$ and $x_{2}$ denote the positions of the particles respectively. The total wave function of the system (not necessarily normalized) can be:", 
+        o: ["$[\\phi_{1}(x_{1})\\phi_{2}(x_{2})-\\phi_{2}(x_{1})\\phi_{1}(x_{2})][|\\uparrow\\rangle_{1}|\\downarrow\\rangle_{2}+|\\downarrow\\rangle_{1}|\\uparrow\\rangle_{2}]$", "$[\\phi_{1}(x_{1})\\phi_{1}(x_{2})+\\phi_{2}(x_{1})\\phi_{2}(x_{2})]|\\uparrow\\rangle_{1}|\\uparrow\\rangle_{2}$", "$\\phi_{1}(x_{1})\\phi_{2}(x_{2})|\\uparrow\\rangle_{1}|\\uparrow\\rangle_{2}$", "$[\\phi_{1}(x_{1})\\phi_{2}(x_{2})-\\phi_{2}(x_{1})\\phi_{1}(x_{2})][|\\uparrow\\rangle_{1}|\\downarrow\\rangle_{2}-|\\downarrow\\rangle_{1}|\\uparrow\\rangle_{2}]$"], 
+        a: 0, m: 3.5, n: 0.875, img: "" 
+    },
+    { 
+        q: "The energy eigenstates of a one-dimensional harmonic oscillator are denoted by $|i\\rangle$, where $i=0,1,2,3,....$ If the momentum operator $\\hat{p}$ satisfies $\\frac{\\langle n+1|\\hat{p}|n\\rangle}{\\langle 2|\\hat{p}|1\\rangle}=\\sqrt{2}$, then the value of n is :", 
+        o: ["0", "1", "2", "3"], 
+        a: 3, m: 3.5, n: 0.875, img: "" 
+    },
+
+    // ==========================================
+    // PART C (Q.46 to Q.75) | Marks: +5, Negative: -1.25
+    // ==========================================
+    { 
+        q: "A highly collimated laser beam with a diameter of 1 cm and wavelength 500 nm is directed from the earth's surface towards the moon (~384,000 km away from the earth). Assuming ideal diffraction limited propagation in vacuum, which of the following best estimates the diameter of the beam upon returning to the earth after reflection from an ideal reflector installed on the moon.", 
+        o: ["200 m", "20 m", "20 km", "200 km"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "If the binding energies per nucleon of the nuclei $X(A=240)$ and $Y(A=120)$ are 7.6 MeV and 8.5 MeV respectively, the energy released in the symmetric fission, $X\\rightarrow Y+Y$ is:", 
+        o: ["94 MeV", "9.4 MeV", "108 MeV", "216 MeV"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A beam of light along the z-axis passes through a quarter wave plate and an analyzer as shown in the figure. The fast axis of the quarter wave plate is aligned with the x-axis. The light intensity is measured by a detector placed after the analyzer. Consider two scenarios where the incident light beam is (A) circularly polarized and (B) linearly polarized along the x-axis. If the polarization axis of the analyzer is rotated by one full cycle about the z-axis, the number of times the detector measures the maximum intensity in each case would be:", 
+        o: ["(A) 4 and (B) 0", "(A) 2 and (B) 0", "(A) 4 and (B) 4", "(A) 2 and (B) 2"], 
+        a: 3, m: 5, n: 1.25, img: "" // Analyzer image needed
+    },
+    { 
+        q: "The value of the integral $\\int_{0}^{\\infty}\\frac{\\cos \\alpha x}{1+x^{2}}dx$, where $\\alpha$ is a positive real number, is:", 
+        o: ["$\\frac{\\pi}{2}e^{-\\alpha}$", "$\\pi e^{-\\alpha}$", "$\\frac{\\pi}{2}e^{-(\\alpha/2)}$", "$\\pi e^{-(\\alpha/2)}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Let $P_{n}(x)$ be a polynomial of degree n with real coefficients, where $n=0,1,2,3,...$ If $\\int_{-1}^{1} P_m(x) P_n(x) dx = \\delta_{mn}$, then $P_{1}(x)$ is:", 
+        o: ["$P_{1}(x)=\\pm\\sqrt{\\frac{3}{2}}(3-x)$", "$P_{1}(x)=\\pm\\sqrt{\\frac{3}{2}}(2-x)$", "$P_{1}(x)=\\pm\\sqrt{\\frac{3}{2}}(1-x)$", "$P_{1}(x)=\\pm\\sqrt{3}(3+x)$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A long cylinder of radius R carries a magnetization $\\vec{M}=k\\rho^{2}\\hat{\\phi}$, where k is a constant, $\\rho$ is the radial distance from the axis and $\\hat{\\phi}$ is the azimuthal unit vector (see in the figure). The magnetic field inside and outside the cylinder would be:", 
+        o: ["$\\vec{B}_{inside}=0, \\vec{B}_{outside}=\\mu_{0}k\\rho^{2}\\hat{\\phi}$", "$\\vec{B}_{inside}=\\mu_{0}k\\rho^{2}\\hat{\\phi}, \\vec{B}_{outside}=0$", "$\\vec{B}_{inside}=\\vec{B}_{outside}=\\mu_{0}k\\rho^{2}\\hat{\\phi}$", "$\\vec{B}_{inside}=\\vec{B}_{outside}=0$"], 
+        a: 1, m: 5, n: 1.25, img: "" // Cylinder image needed
+    },
+    { 
+        q: "Two identical cubes are shown in figure (a) and (b). The magnitude of the magnetic field at the centre of the cube in (a), produced by the currents as shown, is $B_{0}$. The magnetic field at the centre of the cube in (b) will be:", 
+        o: ["$\\sqrt{3}B_{0}$", "$2B_{0}$", "$\\frac{3}{2}B_{0}$", "$\\sqrt{2}B_{0}$"], 
+        a: 0, m: 5, n: 1.25, img: "" // Cubes image needed
+    },
+    { 
+        q: "The minimum number of two input NOR gates required to obtain the following output for three digital inputs A, B and C<br>$Y=(\\overline{A}+\\overline{B}+\\overline{C})(\\overline{A}+B+\\overline{C})(\\overline{A}+\\overline{B}+C)$ would be:", 
+        o: ["4", "3", "5", "6"], 
+        a: 0, m: 5, n: 1.25, img: "" // Assuming Answer is 4 (a) as discussed
+    },
+    { 
+        q: "Consider a laser cooling experiment where atoms are slowed down by an inelastic process of absorption and subsequent emission of photons. If light of wavelength 776.5 nm is used to slow down potassium atoms (mass number 39) with initial speed $130~ms^{-1}$, the number of such absorption and emission cycles needed to bring the atoms to rest is closest to:", 
+        o: ["$10^{3}$", "$10^{2}$", "$10^{5}$", "$10^{4}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The charge density of the electron cloud of a hydrogen atom is given by: $\\rho(r) = - \\frac{e}{\\pi a^3} e^{-2r/a}$ where 'a' is some characteristic length. The potential energy due to the interaction between the proton (sitting at the origin) and the electron cloud is given by:", 
+        o: ["$-\\frac{e^{2}}{2\\pi\\epsilon_{0}a}$", "$-\\frac{e^{2}}{4\\pi\\epsilon_{0}a}$", "$-\\frac{e^{2}}{\\pi\\epsilon_{0}a}$", "$-\\frac{e^{2}}{8\\pi\\epsilon_{0}a}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Consider 2N Ising spins, $S_{i}$ in a one-dimensional lattice with periodic boundary conditions. The Hamiltonian is given by:<br>$H=-J\\sum_{i=1}^{2N}S_{i}S_{i+1}$<br>where J denotes the strength of the nearest-neighbour interactions with $J>0$. Let F be the fully ferromagnetic state and let A be the lowest energy state with zero magnetization. The energy difference between these two states is:", 
+        o: ["$\\frac{3J}{2}$", "4J", "$\\frac{J}{2}$", "2J"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A thermodynamic system (at temperature T and volume V), is described by its internal energy $U=AT^{4}V$ and pressure $p=\\frac{1}{3}AT^{4}$, where A is a constant of appropriate dimension. The Helmholtz free energy of the system is:", 
+        o: ["$\\frac{4}{3}AT^{4}V$", "$\\frac{1}{3}AT^{4}V$", "$-\\frac{1}{3}AT^{4}V$", "$-\\frac{4}{3}AT^{4}V$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Let $|n\\rangle$ denotes the eigenvector of the number operator for a particle of mass m in a one-dimensional potential $V=\\frac{1}{2}m\\omega^{2}x^{2}, [n=0,1,2,...]$. For the state vector $|\\phi(x,t=0)\\rangle=\\frac{1}{\\sqrt{3}}|1\\rangle+\\sqrt{\\frac{2}{3}}|2\\rangle$, $\\langle\\hat{x}(t)\\rangle$ is:", 
+        o: ["$\\frac{2\\sqrt{2}}{3}\\sqrt{\\frac{\\hbar}{2m\\omega}}\\cos \\omega t$", "$\\frac{4}{3}\\sqrt{\\frac{\\hbar}{2m\\omega}}\\cos \\omega t$", "$\\frac{2\\sqrt{2}}{3}\\sqrt{\\frac{\\hbar}{2m\\omega}}\\cos 2\\omega t$", "$\\frac{4}{3}\\sqrt{\\frac{\\hbar}{2m\\omega}}\\cos 2\\omega t$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A semiconductor has the dispersion relation $E=E_{0}-A\\cos(\\alpha k_{x})$, where A and $\\alpha$ are positive constants. The effective electron mass close to the minimum energy is :", 
+        o: ["$\\frac{\\hbar^{2}}{A^{2}\\alpha}$", "$\\frac{1}{4}\\frac{\\hbar^{2}}{A^{2}\\alpha}$", "$\\frac{\\hbar^{2}}{A\\alpha^{2}}$", "$\\frac{1}{2}\\frac{\\hbar^{2}}{A\\alpha^{2}}$"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "In its rest frame, a source emits light in a conical beam of width $-45^{\\circ}$ to $45^{\\circ}$. An observer is moving towards the source with a speed v. For the observer, the beam width appears to be $-30^{\\circ}$ to $30^{\\circ}$. The speed of the observer is closest to:", 
+        o: ["0.62 c", "0.50 c", "0.82 c", "0.41 c"], 
+        a: 3, m: 5, n: 1.25, img: "" // Cones image needed
+    },
+    { 
+        q: "The $\\rho$-mesons are $J^{P}=1^{-}$ particles that decay strongly into pions. The ratio of the particle decay widths $\\frac{\\Gamma(\\rho^{0}\\rightarrow\\pi^{0}\\pi^{0})}{\\Gamma(\\rho^{+}\\rightarrow\\pi^{+}\\pi^{0})}$ is closest to:", 
+        o: ["1", "1/2", "0", "2"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The current $I_{J}(t)$ through a Josephson junction (shown by the crossed box in the figure) and the voltage $V(t)$ across it, are given by:<br>$I_{J}(t)=I_{C}\\sin \\phi(t)$<br>$\\frac{d\\phi(t)}{dt}=\\frac{2eV(t)}{\\hbar}$<br>where $I_{C}$ is the critical current of the junction and $\\phi(t)$ is the phase difference across the junction. A resistor R is connected in parallel to the junction and a constant current $I>I_{C}$ flows through the combination as shown. The energy dissipated in R in the time $\\phi$ changes by $2\\pi$ is:", 
+        o: ["$\\frac{h}{2e}I$", "$\\frac{h}{2e}I_{C}$", "$\\frac{h}{2e}(I-I_{C})$", "$\\frac{h}{2e}(I+I_{C})$"], 
+        a: 0, m: 5, n: 1.25, img: "" // Circuit diagram needed
+    },
+    { 
+        q: "An atom is subjected to a weak magnetic field $B=0.1~T$. A spectral line of wavelength 184.9 nm corresponding to a $J=1$ to $J=0$ transition splits into three components. The highest and the lowest components are separated by $3.2\\times10^{-4}$ nm. The magnetic moment of the atom in $J=1$ state (in units of Bohr magneton) is:", 
+        o: ["2.82", "0.71", "1.41", "4.23"], 
+        a: 2, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A thin circular wire loop of mass M, having radius R, carries a static charge Q. The plane of the loop is held perpendicular to a uniform magnetic field $\\vec{B}$ along the z-axis passing through its centre, as shown in the figure. The loop, initially at rest, can freely rotate about the z-axis. When the magnetic field is switched off the loop starts rotating with an angular frequency:", 
+        o: ["$\\frac{QB}{M}$", "$\\frac{QB}{2M}$", "$\\frac{\\pi QB}{M}$", "$\\frac{\\pi QB}{2M}$"], 
+        a: 1, m: 5, n: 1.25, img: "" // Loop with B field image needed
+    },
+    { 
+        q: "A rigid molecule can have two possible rotational states $j=0$ or $j=1$. Its rotational energies are given by $\\epsilon_{j}=\\frac{\\hbar^{2}}{2I}j(j+1)$ where I is its moment of inertia. For an ensemble of such molecules in thermal equilibrium at temperature T, the ratio of the number of molecules in the $j=1$ state $(N_{1})$, to those in $j=0$ state $(N_{0})$, is $\\frac{N_{1}}{N_{0}}=0.003$. The temperature T (in units of $\\frac{\\hbar^{2}}{2Ik_{B}}$, where $k_{B}$ is the Boltzmann constant) is closest to :", 
+        o: ["0.29", "0.21", "0.15", "0.34"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "In a rotational-vibrational spectrum of HCl $(H^{35}Cl)$, the first R-branch line and the first P-branch line are observed at $\\lambda^{-1}=2906~cm^{-1}$ and $\\lambda^{-1}=2865~cm^{-1}$, respectively. The equilibrium bond length of this molecule would be closest to:", 
+        o: ["0.2 \\AA", "1.3 \\AA", "13 \\AA", "2.1 \\AA"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A gas of electrons (with no source of scattering) is placed in an electric field $\\vec{E}=E_{0}e^{i\\omega t}(\\hat{i}+\\hat{k})$ and a magnetic field $\\vec{B}=B\\hat{k}$, where $E_{0}$ and B are constants. The frequency at which the conductivity in the z-direction, given by the ratio of the current and the electric field, both in the z-direction, diverges is:", 
+        o: ["0", "$\\frac{eB}{m}$", "$-\\frac{eB}{m}$", "$\\frac{eB}{2m}$"], 
+        a: 0, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "For a free particle of mass m, consider the following time dependent quantity in phase space:<br>$Q=\\frac{qp}{m}-\\frac{p^{2}t}{m^{2}}$<br>where q and p are the canonically conjugate position and momentum coordinates respectively. Then $dQ/dt$ is given by:", 
+        o: ["0", "$\\frac{p^{2}}{m^{2}}$", "$-\\frac{p^{2}}{m^{2}}$", "$\\frac{qp}{mt}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "A massless rod of length l is hinged at the extreme end of a vertical spring whose other end is fixed to the ground. A point mass m is fixed at the end of the rod, as shown in the figure. Assume harmonic motion of the spring given by $h(t)=h_{0}(2+\\cos \\omega t)$, where $h_{0}>l$. The equation of motion of the mass (confined to the plane of the figure) is given by:", 
+        o: ["$l\\ddot{\\theta}+\\omega^{2}h_{0}\\sin \\theta \\sin \\omega t-g \\sin \\theta=0$", "$l\\ddot{\\theta}+\\omega^{2}h_{0}\\sin \\theta \\cos \\omega t-g \\sin \\theta=0$", "$l\\ddot{\\theta}+\\omega^{2}h_{0}\\sin \\theta \\cos \\omega t+g \\sin \\theta=0$", "$l\\ddot{\\theta}-\\omega^{2}h_{0}\\sin \\theta \\sin \\omega t+g \\sin \\theta=0$"], 
+        a: 0, m: 5, n: 1.25, img: "" // Spring and rod image needed
+    },
+    { 
+        q: "Two discrete time random walkers start from the point $x=0$ at time $t=0$ taking discrete steps of unit length along the x-axis. The first walker is unbiased and the second walker is biased to move towards the right with probability p. The probability that they are at a distance of 2 units from each other at both time steps $t=1$ and $t=2$ is:", 
+        o: ["$\\frac{1}{4}$", "$\\frac{1}{2}-\\frac{p}{2}$", "$1-\\frac{3p}{4}$", "$\\frac{p}{2}$"], 
+        a: 1, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The probability density of a free particle of mass m at time $t=0$, is given by: $A\\exp(-\\frac{x^{2}}{2\\sigma^{2}(0)})$. At $t>0$, its probability density is proportional to $\\exp(-\\frac{x^{2}}{2\\sigma^{2}(t)})$ where $\\sigma^{2}(t)$ is:", 
+        o: ["$\\sigma^{2}(0)+\\frac{\\hbar^{2}t^{2}}{\\sigma^{2}(0)m^{2}}$", "$\\sigma^{2}(0)+\\frac{\\hbar^{2}t^{2}}{4\\sigma^{2}(0)m^{2}}$", "$\\sigma^{2}(0)+\\frac{4\\hbar^{2}t^{2}}{\\sigma^{2}(0)m^{2}}$", "$\\sigma^{2}(0)+\\frac{2\\hbar^{2}t^{2}}{\\sigma^{2}(0)m^{2}}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "The ground state wavefunction for the hydrogen atom is: $\\psi_{0}=\\sqrt{\\frac{1}{\\pi a_{0}^{3}}}e^{-\\frac{r}{a_{0}}}$ (where $a_{0}$ is the Bohr radius). Considering an additional potential $H^{\\prime}$ as a perturbation to the hydrogen atom Hamiltonian, given by: $H^{\\prime}=[\\frac{e^{2}}{4\\pi\\epsilon_{0}}][\\frac{1}{r}-\\frac{1}{R}]$ for $0<r<R$ and $0$ for $r>R$, where R is the radius of the proton, $R\\ll a_{0}$. The shift in the ground state energy due to $H^{\\prime}$ is:", 
+        o: ["$(\\frac{e^{2}}{4\\pi\\epsilon_{0}a_{0}})\\frac{4R^{2}}{3a_{0}^{2}}$", "$(\\frac{e^{2}}{4\\pi\\epsilon_{0}a_{0}})\\frac{R}{a_{0}}$", "$-(\\frac{e^{2}}{4\\pi\\epsilon_{0}a_{0}})\\frac{2R^{2}}{a_{0}^{2}}$", "$(\\frac{e^{2}}{4\\pi\\epsilon_{0}a_{0}})\\frac{2R^{2}}{3a_{0}^{2}}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "When a neutron of 1 keV kinetic energy impinges on a $^{12}C$ target, the total scattering cross-section is 1000 barns. The approximate value of the phase shift $\\delta_{0}$ is:", 
+        o: ["$18^{\\circ}$", "$108^{\\circ}$", "$90^{\\circ}$", "$36^{\\circ}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "From a straight-line segment of unit length, three points are chosen at random, one after another. The probability that they are in increasing order is:", 
+        o: ["$\\frac{1}{3}$", "$\\frac{1}{8}$", "$\\frac{1}{9}$", "$\\frac{1}{6}$"], 
+        a: 3, m: 5, n: 1.25, img: "" 
+    },
+    { 
+        q: "Which one of the following curves best represents the solution of the differential equation: $\\frac{dx}{dt}+x=1$, with the initial condition $x(0)=0$?", 
+        o: ["Curve (a)", "Curve (b)", "Curve (c)", "Curve (d)"], 
+        a: 0, m: 5, n: 1.25, img: "" // Curves image needed
+    }
+];
+
+// ==========================================
+
+// NAYA CODE: SECTION LIMITS & RULES
+var secMeta = {
+    'A': { s: 0, e: 19, max: 15 },
+    'B': { s: 20, e: 44, max: 20 },
+    'C': { s: 45, e: 74, max: 20 }
+};
+var currentSec = 'A';
+var cQ=0, uA=[], qS=[], tInt;
+
+setTimeout(function() {
+    for(var i=0; i<qs.length; i++){ uA.push(null); qS.push('n-vis'); }
+}, 500);
+
+// Section badalne ka function
+function switchSec(sec) {
+    currentSec = sec;
+    document.getElementById('tab-A').className = (sec==='A')?'active':'';
+    document.getElementById('tab-B').className = (sec==='B')?'active':'';
+    document.getElementById('tab-C').className = (sec==='C')?'active':'';
+    
+    // Sirf usi section ke bubbles palette mein dikhayega
+    var p = document.getElementById('pal');
+    p.innerHTML = '';
+    if(qs.length > 0) {
+        for(var i=secMeta[sec].s; i<=secMeta[sec].e; i++) {
+            var b = document.createElement('div');
+            b.className = 'bub ' + qS[i];
+            b.id = 'b-'+i;
+            b.innerText = i+1;
+            (function(idx){ b.onclick = function(){ lQ(idx); }; })(i);
+            p.appendChild(b);
+        }
+        lQ(secMeta[sec].s); // Switch karte hi uss section ka pehla question khulega
+    }
+}
+
+function getSec(idx) {
+    if(idx <= 19) return 'A';
+    if(idx <= 44) return 'B';
+    return 'C';
+}
+
+function iT(){ switchSec('A'); }
+
+function startTest() {
+    document.getElementById('inst').style.display='none';
+    document.getElementById('test').style.display='flex';
+    sT(10800); // 3 Hours (10800 seconds) for real CSIR NET
+}
+
+function lQ(i){
+    // Agar next dabate dabate doosra section aa jaye, toh tab automatic change ho jayega
+    var targetSec = getSec(i);
+    if(targetSec !== currentSec) {
+        switchSec(targetSec);
+        return; 
+    }
+    
+    if(qS[cQ]==='n-vis') uS(cQ,'n-ans');
+    cQ=i; 
+    var q=qs[i];
+    document.getElementById('qn').innerText=cQ+1;
+    document.getElementById('qm').innerText=q.m;
+    document.getElementById('qn-m').innerText="-"+q.n;
+    document.getElementById('qt').innerHTML=q.q;
+    
+    var imgHtml = "";
+    if(q.img && q.img !== "") imgHtml = "<img src='" + q.img + "' class='q-img'>";
+    document.getElementById('qi').innerHTML = imgHtml;
+    
+    var oH='';
+    for(var j=0; j<q.o.length; j++){
+        var ch = (uA[cQ]===j) ? 'checked' : '';
+        oH += "<li><label><input type=" + '"radio" name="opt" value="' + j + '" ' + ch + "> " + q.o[j] + "</label></li>";
+    }
+    document.getElementById('ol').innerHTML=oH;
+    
+    setTimeout(function(){ if(window.MathJax) { MathJax.typesetClear(); MathJax.typeset(); } }, 100);
+}
+
+function getSelected(){
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) { if(ops[i].checked) return parseInt(ops[i].value); }
+    return null;
+}
+
+function uS(i,s){
+    qS[i]=s;
+    var b=document.getElementById('b-'+i);
+    if(b) b.className='bub '+s;
+}
+
+// NAYA CODE: STRICT ATTEMPT LIMIT GUARD
+function checkLimitAndSave(status) {
+    var sel = getSelected();
+    if(sel !== null) {
+        // Agar naya answer de raha hai (pehle se attempt nahi tha)
+        if(uA[cQ] === null) {
+            var sec = getSec(cQ);
+            var ansCount = 0;
+            for(var i=secMeta[sec].s; i<=secMeta[sec].e; i++) {
+                if(uA[i] !== null) ansCount++;
+            }
+            // Agar limit poori ho gayi
+            if(ansCount >= secMeta[sec].max) {
+                alert("⚠️ CSIR NET Rule:\nYou can only attempt a maximum of " + secMeta[sec].max + " questions in Part " + sec + ". To attempt this, please clear response of any other question in this part.");
+                var ops = document.getElementsByName('opt');
+                for(var k=0; k<ops.length; k++) ops[k].checked = false; // Checkbox hٹا do
+                return; // Rok do
+            }
+        }
+        uA[cQ] = sel;
+        uS(cQ, status);
+    } else {
+        uS(cQ, 'n-ans');
+    }
+    if(cQ < qs.length - 1) lQ(cQ + 1);
+}
+
+function sav(){ checkLimitAndSave('ans'); }
+function rev(){ checkLimitAndSave('rev'); }
+
+function clr(){
+    uA[cQ]=null;
+    var ops=document.getElementsByName('opt');
+    for(var i=0; i<ops.length; i++) ops[i].checked=false;
+    uS(cQ,'n-ans');
+}
+
+function sT(d){
+    var t=d,m,s;
+    tInt=setInterval(function(){
+        m=parseInt(t/60,10); 
+        s=parseInt(t%60,10);
+        m=m<10 ? "0"+m : m; 
+        s=s<10 ? "0"+s : s;
+        document.getElementById('time').innerText=m+":"+s;
+        if(--t<0){ clearInterval(tInt); alert("Time is UP!"); finalSubmit(true); }
+    },1000);
+}
+
+// --- ADVANCED FEEDBACK & RESULT LOGIC ---
+var ratings = { exp: 0, tech: 0, qual: 0 };
+
+function finalSubmit(force){
+    if(!force && !confirm("Are you sure you want to final submit the test?")) return;
+    clearInterval(tInt);
+    document.getElementById('test').style.display='none';
+    document.getElementById('feedback-modal').style.display='flex';
+}
+
+function setRating(category, stars) {
+    ratings[category] = stars;
+    let starElements = document.getElementById('star-' + category).getElementsByTagName('span');
+    for(let i=0; i<5; i++) {
+        if(i < stars) starElements[i].style.color = "#ffc107"; 
+        else starElements[i].style.color = "#ccc"; 
+    }
+}
+
+function submitFeedbackAndShowResult() {
+    if(ratings.exp === 0 || ratings.tech === 0 || ratings.qual === 0) { 
+        alert("Please provide star ratings for all 3 categories!"); 
+        return; 
+    }
+        var comment = document.getElementById('feedback-comment').value;
+    try {
+        var currentUser = firebase.auth().currentUser;
+        if(currentUser) {
+            var db = firebase.firestore();
+            db.collection('feedbacks').add({
+                email: currentUser.email || "Unknown",
+                testName: document.title,
+                experienceRating: ratings.exp,
+                technicalRating: ratings.tech,
+                qualityRating: ratings.qual,
+                comment: comment,
+                date: new Date().toLocaleString()
+            });
+        }
+    } catch(e) {}
+    document.getElementById('feedback-modal').style.display='none';
+    calculateAndShowResults();
+}
+
+function calculateAndShowResults() {
+    document.getElementById('feedback-modal').style.display='none';
+    document.getElementById('res').style.display='block';
+    
+    var sc=0, c=0, w=0, u=0;
+    // Total marks fixed as 200 for CSIR NET
+    var fixedMaxMarks = 200; 
+    
+    for(var i=0; i<qs.length; i++){
+        if(uA[i]===null) u++;
+        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
+        else { sc-=qs[i].n; w++; }
+    }
+    
+    document.getElementById('f-sc').innerText=sc.toFixed(3);
+    document.getElementById('rc-c').innerText=c;
+    document.getElementById('rc-i').innerText=w;
+    document.getElementById('rc-u').innerText=u;
+    
+    var acc = 0;
+    if(c+w > 0) acc = (c/(c+w)*100);
+    document.getElementById('rc-a').innerText=acc.toFixed(2);
+
+    try {
+        var currentUser = firebase.auth().currentUser;
+        var finalScore = sc.toFixed(3);
+        var testTitle = document.title; 
+        var currentDate = new Date().toLocaleString();
+        var userIdentifier = currentUser ? (currentUser.email || currentUser.phoneNumber || "Student") : "Local_Tester";
+
+        var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+        var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + fixedMaxMarks;
+
+        fetch(scriptURL, {
+            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: userIdentifier, mobile: "Attempted at: " + currentDate, password: combinedScoreData })
+        });
+
+        if (currentUser) {
+            var db = firebase.firestore();
+            db.collection('students').doc(currentUser.uid).collection('marks').add({
+                testName: testTitle, score: finalScore, totalMarks: fixedMaxMarks, date: currentDate, timestamp: firebase.firestore.FieldVal.serverTimestamp()
+            });
+        }
+    } catch(e) {}
+
+    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Paper Analysis:</h3>";
+    for(var j=0; j<qs.length; j++){
+        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+        var qImgStr = "";
+        if(qs[j].img && qs[j].img !== "") qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        
+        var optionsHtml = "<ul style='list-style:none; padding:0;'>";
+        for(var k=0; k<qs[j].o.length; k++) {
+            var optBg = "#fff", optColor = "#333", optBorder = "1px solid #ccc", icon = "";
+            if (uA[j] === k) {
+                if (uA[j] === qs[j].a) { optBg = "#28a745"; optColor = "#fff"; optBorder = "1px solid #28a745"; icon = " ✔️"; } 
+                else { optBg = "#dc3545"; optColor = "#fff"; optBorder = "1px solid #dc3545"; icon = " ❌"; }
+            } 
+            optionsHtml += "<li style='padding:12px; margin-bottom:10px; border-radius:6px; background:"+optBg+"; color:"+optColor+"; border:"+optBorder+"; font-size:16px;'>" + qs[j].o[k] + icon + "</li>";
+        }
+        optionsHtml += "</ul>";
+        
+        var answerText = "<div style='margin-top:15px; padding:15px; background:#e8f4f8; border-left:4px solid #0056b3; border-radius:4px;'><span style='color:#0056b3; font-size:16px;'><b>✅ Correct Answer:</b> " + qs[j].o[qs[j].a] + "</span></div>";
+        detHtml += "<div style='padding:25px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px; margin-bottom:25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);'><div style='font-size:18px; margin-bottom:20px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.6;'>"+qs[j].q+qImgStr+"</div></div>" + optionsHtml + answerText + "</div>";
+    }
+    document.getElementById('detailed-res').innerHTML=detHtml;
+    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+    if(window.Chart) { new Chart(document.getElementById('rc').getContext('2d'),{ type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]} }); }
+}
+
+var cExp="";
+function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
+function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
+function cC(){ cExp=""; document.getElementById('cd').value=""; }
+function cE(){ try { cExp=eval(cExp).toString(); document.getElementById('cd').value=cExp; } catch(e) { document.getElementById('cd').value="Error"; cExp=""; } }
+
+window.onload=iT;
+window.onbeforeunload=function(){ return "Are you sure you want to refresh? Test progress will be lost."; };
+</script>
+</body>
+</html>
