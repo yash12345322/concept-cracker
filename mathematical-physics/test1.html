@@ -261,64 +261,61 @@ function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;
 function finalSubmit(force){
     if(!force && !confirm("Are you sure you want to submit the test?")) return;
     clearInterval(tInt);
-    document.getElementById('test').style.display='none';
-    document.getElementById('res').style.display='block';
     
-    var sc=0, c=0, w=0, u=0, ms=0;
-    for(var i=0; i<qs.length; i++){
-        ms+=qs[i].m;
-        if(uA[i]===null) u++;
-        else if(uA[i]===qs[i].a) { sc+=qs[i].m; c++; }
-        else { sc-=qs[i].n; w++; }
-    }
-    
-    document.getElementById('f-sc').innerText=sc.toFixed(3);
-    document.getElementById('m-sc').innerText=ms;
-    document.getElementById('rc-c').innerText=c;
-    document.getElementById('rc-i').innerText=w;
-    document.getElementById('rc-u').innerText=u;
-    
-    var acc = 0;
-    if(c+w > 0) acc = (c/(c+w)*100);
-    document.getElementById('rc-a').innerText=acc.toFixed(2);
-
-    // ==========================================================
-    // NAYA INDEPENDENT CODE: SAVE SCORE (CLEANED)
-    // ==========================================================
+    // TRY-CATCH GUARD: Agar koi error aayi toh code crash nahi hoga, alert dega!
     try {
-        var currentUser = firebase.auth().currentUser;
-        if(currentUser) {
-            var finalScore = sc.toFixed(3);
-            var testTitle = "Quantum Mechanics - Test 1"; // Test ka naam
-            var currentDate = new Date().toLocaleString();
-            
-            // User ki pehchaan nikalna
-            var userIdentifier = "Student";
-            if(currentUser.email) {
-                userIdentifier = currentUser.email;
-            } else if (currentUser.phoneNumber) {
-                userIdentifier = currentUser.phoneNumber;
+        document.getElementById('test').style.display='none';
+        document.getElementById('res').style.display='block';
+        
+        var sc=0, c=0, w=0, u=0, ms=0;
+        for(var i=0; i<qs.length; i++){
+            ms += qs[i].m;
+            if(uA[i] === null) { 
+                u++; 
+            } else if(uA[i] === qs[i].a) { 
+                sc += qs[i].m; c++; 
+            } else { 
+                sc -= qs[i].n; w++; 
             }
+        }
+        
+        document.getElementById('f-sc').innerText=sc.toFixed(3);
+        document.getElementById('m-sc').innerText=ms;
+        document.getElementById('rc-c').innerText=c;
+        document.getElementById('rc-i').innerText=w;
+        document.getElementById('rc-u').innerText=u;
+        
+        var acc = 0;
+        if(c+w > 0) acc = (c/(c+w)*100);
+        document.getElementById('rc-a').innerText=acc.toFixed(2);
 
-            // --- 1. GOOGLE SHEET PAR BHEJNA ---
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
-            var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
+        // ==========================================================
+        // SAFE SCORE SAVING (FIREBASE & GOOGLE SHEET)
+        // ==========================================================
+        try {
+            var currentUser = firebase.auth().currentUser;
+            if(currentUser) {
+                var finalScore = sc.toFixed(3);
+                var testTitle = document.title; // Page ka title khud utha lega
+                var currentDate = new Date().toLocaleString();
+                var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
 
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: userIdentifier, 
-                    mobile: "Attempted at: " + currentDate, 
-                    password: combinedScoreData 
-                })
-            }).then(() => {
-                console.log("✅ Google Sheet mein score chala gaya!");
-            }).catch(err => console.log("Google Sheet Error: ", err));
+                // Google Sheet Update
+                var scriptURL = 'https://script.google.com/macros/s/AKfycbxDzUgqTeWi5hcL1P3beXCeG-Q2oijxZvLZQttReL8gXP0DPjPScfWV-uZesp2a_SRU/exec';
+                var combinedScoreData = testTitle + " | Score: " + finalScore + "/" + ms;
 
-            // --- 2. FIREBASE PROFILE MEIN BHEJNA ---
-            try {
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: userIdentifier, 
+                        mobile: "Attempted at: " + currentDate, 
+                        password: combinedScoreData 
+                    })
+                }).catch(err => console.log("Google Sheet Error: ", err));
+
+                // Firebase Update
                 var db = firebase.firestore();
                 db.collection('students').doc(currentUser.uid).collection('marks').add({
                     testName: testTitle,
@@ -327,46 +324,75 @@ function finalSubmit(force){
                     date: currentDate,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            } catch(dbErr) {
-                console.log("Database connection error.");
             }
+        } catch(dbErr) {
+            console.log("Saving Error (TrebEdit me normal hai): ", dbErr);
         }
-    } catch(e) {
-        console.log("Login check error: ", e);
-    }
-    // ==========================================================
+        // ==========================================================
 
-    var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Analysis:</h3>";
-    for(var j=0; j<qs.length; j++){
-        var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
-        var yA = (uA[j]===null) ? "None" : qs[j].o[uA[j]];
-        var cA = qs[j].o[qs[j].a];
+        // --- NAYA SMART PAPER (COLOR CODED) RESULT LOGIC ---
+        var detHtml="<h3 style='text-align:center; color:#003366; font-size:24px; margin-bottom:30px;'>Detailed Question Paper Analysis:</h3>";
         
-        var qImgStr = "";
-        if(qs[j].img && qs[j].img !== "") {
-            qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+        for(var j=0; j<qs.length; j++){
+            var stat = (uA[j]===null) ? "<span style='color:#6c757d; font-weight:bold;'>[Unattempted]</span>" : (uA[j]===qs[j].a ? "<span style='color:green; font-weight:bold;'>[Correct]</span>" : "<span style='color:red; font-weight:bold;'>[Incorrect]</span>");
+            
+            var qImgStr = "";
+            if(qs[j].img && qs[j].img !== "") {
+                qImgStr = "<br><img src='" + qs[j].img + "' style='max-width:100%; border:1px solid #ccc; margin-top:10px; border-radius:4px;'>";
+            }
+            
+            // 4 Options ki list banana aur Color Code karna (VIP Look)
+            var optionsHtml = "<ul style='list-style:none; padding:0;'>";
+            for(var k=0; k<qs[j].o.length; k++) {
+                var optBg = "#fff";
+                var optColor = "#333";
+                var optBorder = "1px solid #ccc";
+                var icon = "";
+
+                if (uA[j] === k) { // Agar bacche ne ye option select kiya tha
+                    if (uA[j] === qs[j].a) { // Sahi jawab (GREEN)
+                        optBg = "#28a745"; optColor = "#fff"; optBorder = "1px solid #28a745";
+                        icon = " ✔️";
+                    } else { // Galat jawab (RED)
+                        optBg = "#dc3545"; optColor = "#fff"; optBorder = "1px solid #dc3545";
+                        icon = " ❌";
+                    }
+                } 
+                optionsHtml += "<li style='padding:12px; margin-bottom:10px; border-radius:6px; background:"+optBg+"; color:"+optColor+"; border:"+optBorder+"; font-size:16px;'>" + qs[j].o[k] + icon + "</li>";
+            }
+            optionsHtml += "</ul>";
+            
+            // Niche Correct Answer ka box
+            var cA = qs[j].o[qs[j].a];
+            var answerText = "<div style='margin-top:15px; padding:15px; background:#e8f4f8; border-left:4px solid #0056b3; border-radius:4px;'>" +
+                             "<span style='color:#0056b3; font-size:16px;'><b>✅ Correct Answer:</b> " + cA + "</span></div>";
+            
+            detHtml += "<div style='padding:25px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px; margin-bottom:25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);'>" +
+                            "<div style='font-size:18px; margin-bottom:20px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.6;'>"+qs[j].q+qImgStr+"</div></div>" +
+                            optionsHtml +
+                            answerText + 
+                        "</div>";
+        }
+        document.getElementById('detailed-res').innerHTML = detHtml;
+        
+        // MathJax equations ko dobara load karna
+        if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
+        
+        // Graph Banana
+        if(window.Chart) {
+            new Chart(document.getElementById('rc').getContext('2d'),{
+                type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
+            });
         }
         
-        detHtml += "<div style='padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;'>" +
-                        "<div style='font-size:18px; margin-bottom:15px;'><b>Question "+(j+1)+":</b> "+stat+"<br><br><div style='color:#333; line-height:1.5;'>"+qs[j].q+qImgStr+"</div></div>" +
-                        "<div style='background:#fff; padding:15px; border-radius:5px; border-left:4px solid #003366;'>" +
-                            "<span style='color:#555; font-size:16px;'><b>Your Answer:</b> "+yA+"</span><br><br>" +
-                            "<span style='color:#003366; font-size:16px;'><b>Correct Answer:</b> "+cA+"</span>" +
-                        "</div>" +
-                    "</div>";
-    }
-    document.getElementById('detailed-res').innerHTML=detHtml;
-    
-    if(window.MathJax) { setTimeout(function(){ MathJax.typeset(); }, 500); }
-    
-    if(window.Chart) {
-        new Chart(document.getElementById('rc').getContext('2d'),{
-            type:'doughnut', data:{labels:['Correct','Incorrect','Unattempted'], datasets:[{data:[c,w,u], backgroundColor:['#28a745','#dc3545','#6c757d']}]}
-        });
+    } catch(err) {
+        // Agar koi galti hui, toh ye screen ko atakkne nahi dega
+        alert("Oops! Ek technical error aayi hai result banate time:\n\n" + err.message);
+        console.error("Result Generation Error: ", err);
     }
 }
 
-// ==== DELETED HUA CODE WAPAS AAGAYA ====
+// ==== CALCULATOR CODE ====
 var cExp="";
 function tCal(){ var c=document.getElementById('calc'); c.style.display=(c.style.display==='block')?'none':'block'; }
 function cI(v){ cExp+=v; document.getElementById('cd').value=cExp; }
