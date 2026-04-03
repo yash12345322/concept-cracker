@@ -255,7 +255,9 @@ function tCal(){var c=document.getElementById('calc');c.style.display=c.style.di
 function cI(v){cS+=v;document.getElementById('cd').value=cS;}
 function cC(){cS="";document.getElementById('cd').value="";}
 function cE(){try{cS=eval(cS).toString();document.getElementById('cd').value=cS;}catch(e){document.getElementById('cd').value="Err";cS="";}}
-function finalSubmit(force){
+function 
+   
+   finalSubmit(force){
     if(!force && !confirm("Are you sure you want to submit the test?")) return;
     clearInterval(tInt);
     
@@ -293,7 +295,7 @@ function finalSubmit(force){
             var currentUser = firebase.auth().currentUser;
             if(currentUser) {
                 var finalScore = sc.toFixed(3);
-                var testTitle = document.title; // Page ka title khud utha lega
+                var testTitle = "mathemmatical physics- Test 1"; // Page ka title khud utha lega
                 var currentDate = new Date().toLocaleString();
                 var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
 
