@@ -3,102 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Exam - Concepts Creakers</title>
+    <title>Select Exam | Concept Cracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { 
-            font-family: sans-serif; 
-            background: #f4f4f4; 
-            margin: 0; 
-            padding: 40px 20px; 
-            text-align: center; 
-        }
-        h1 { color: #003366; margin-bottom: 40px; font-size: 28px; }
+        :root { --primary: #002347; --secondary: #00509d; --accent: #ff9800; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
         
-        .grid { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 25px; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-        }
+        /* Navbar */
+        nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; text-decoration: none; }
+        .logo span { color: var(--accent); }
+        .nav-links a { text-decoration: none; color: #444; font-weight: 500; margin-left: 30px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
+
+        /* Header */
+        .header-sec { text-align: center; padding: 50px 20px 20px; }
+        .header-sec h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
+        .header-sec p { color: #666; font-size: 16px; }
+
+        /* Grid & Cards */
+        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1100px; margin: 40px auto; padding: 0 20px 50px; }
         
-        .card { 
-            background: #fff; 
-            width: 260px; 
-            padding: 40px 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            position: relative; 
-            overflow: hidden; 
-            border: 2px solid transparent; 
-        }
+        .card { background: var(--white); width: 280px; padding: 40px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; border: 2px solid transparent; text-align: center; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         
-        .card:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15); 
-        }
-        
-        /* Active Card (CSIR NET) */
-        .card.active { border-color: #28a745; }
-        .card.active h2 { color: #28a745; }
+        /* Active Card */
+        .card.active { border-bottom: 5px solid var(--accent); }
+        .card.active h2 { color: var(--primary); }
+        .card.active i { color: var(--secondary); }
         
         /* Disabled Cards */
-        .card.disabled { opacity: 0.8; background: #fafafa; }
-        .card.disabled h2 { color: #555; }
+        .card.disabled { opacity: 0.85; background: #fafafa; border-bottom: 5px solid #ccc; }
+        .card.disabled h2 { color: #666; }
+        .card.disabled i { color: #999; }
         
-        .card h2 { margin: 0 0 10px 0; font-size: 24px; font-weight: bold; }
-        .card p { color: #666; font-size: 15px; margin: 0; }
+        .card i { font-size: 45px; margin-bottom: 15px; transition: 0.3s; }
+        .card h2 { margin: 0 0 10px 0; font-size: 22px; font-weight: bold; }
+        .card p { color: #666; font-size: 14px; margin: 0; }
         
-        /* Ribbons / Badges */
-        .badge { 
-            position: absolute; 
-            top: 20px; 
-            right: -35px; 
-            background: #dc3545; 
-            color: white; 
-            padding: 5px 40px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            transform: rotate(45deg); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        /* Ribbons */
+        .badge { position: absolute; top: 20px; right: -35px; background: #dc3545; color: white; padding: 5px 40px; font-size: 12px; font-weight: bold; transform: rotate(45deg); box-shadow: 0 2px 4px rgba(0,0,0,0.2); letter-spacing: 1px;}
         .badge.live { background: #28a745; }
     </style>
 </head>
 <body>
 
-    <h1>Select Your Target Examination 🎯</h1>
+    <nav>
+        <a href="index.html" class="logo">CONCEPT <span>CRACKER</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <div class="header-sec">
+        <h1>Select Your Target Examination 🎯</h1>
+        <p>Choose your exam to access mock tests, PYQs, and premium notes.</p>
+    </div>
 
     <div class="grid">
         <div class="card active" onclick="window.location.href='subjects.html'">
             <div class="badge live">LIVE NOW</div>
+            <i class="fas fa-atom"></i>
             <h2>CSIR NET</h2>
             <p>Physical Sciences</p>
         </div>
 
         <div class="card disabled" onclick="alert('GATE Physics Test Series is launching soon! Stay tuned. 🚀')">
             <div class="badge">SOON</div>
+            <i class="fas fa-microscope"></i>
             <h2>GATE</h2>
             <p>Physics (PH)</p>
         </div>
 
         <div class="card disabled" onclick="alert('JEST Physics Test Series is launching soon! 🚀')">
             <div class="badge">SOON</div>
+            <i class="fas fa-satellite-dish"></i>
             <h2>JEST</h2>
             <p>Physics</p>
         </div>
 
         <div class="card disabled" onclick="alert('BARC Scientific Officer Test Series is launching soon! 🚀')">
             <div class="badge">SOON</div>
+            <i class="fas fa-radiation"></i>
             <h2>BARC</h2>
             <p>Scientific Officer (Physics)</p>
         </div>
         
         <div class="card disabled" onclick="alert('IIT JAM Physics Test Series is launching soon! 🚀')">
             <div class="badge">SOON</div>
+            <i class="fas fa-flask"></i>
             <h2>IIT JAM</h2>
             <p>Physics</p>
         </div>
@@ -106,4 +99,3 @@
 
 </body>
 </html>
-
