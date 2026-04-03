@@ -474,7 +474,7 @@ function calculateAndShowResults() {
         var currentUser = firebase.auth().currentUser;
         if(currentUser) {
             var finalScore = sc.toFixed(3);
-            var testTitle = document.title; 
+            var testTitle = "mathematical physics - test 2"; 
             var currentDate = new Date().toLocaleString();
             var userIdentifier = currentUser.email || currentUser.phoneNumber || "Student";
 
